@@ -101,6 +101,36 @@ trait UserApiRoutes extends JsonSupport with RouteHandling {
         }
       }
     }
+  } ~ path("api" / apiVersion / "users" / Segment / "password") { id =>
+    put {
+      entity(as[PasswordData]) { pd =>
+        pd.password match {
+          case Some(pass) if pass.nonEmpty =>
+            handle(
+              userManagement.updatePassword(User.Id(id), Password(pass))
+            ) {
+            case Right(u) => respondWithHeader(
+              RawHeader(UserVersionHeader, u.metadata.version.toString)) {
+              complete(StatusCodes.NoContent)
+            }
+            case Left(err) =>  handleLeft(err) {
+              case Error.NotFound => notFound(id)
+              case Error.Deleted => gone(id)
+            }
+          }
+          case _ => handle(userManagement.resetPassword( User.Id(id))) {
+            case Right(u) => respondWithHeader(
+              RawHeader(UserVersionHeader, u.metadata.version.toString)) {
+              complete(StatusCodes.NoContent)
+            }
+            case Left(err) =>  handleLeft(err) {
+              case Error.NotFound => notFound(id)
+              case Error.Deleted => gone(id)
+            }
+          }
+        }
+      }
+    }
   }
 
   private def notFound(id: String): StandardRoute = complete((
