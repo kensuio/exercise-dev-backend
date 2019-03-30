@@ -44,6 +44,9 @@ object UserApiRoutes {
   final case class EmailData(email: String)
   final case class PasswordData(password: Option[String])
   final case class StatusData(status: String)
+
+  val StatusActive = "active"
+  val StatusBlocked = "blocked"
 }
 
 trait UserApiRoutes extends JsonSupport with RouteHandling {
@@ -128,6 +131,43 @@ trait UserApiRoutes extends JsonSupport with RouteHandling {
               case Error.Deleted => gone(id)
             }
           }
+        }
+      }
+    }
+  } ~ path("api"/ "admin" / apiVersion / "users" / Segment / "status") { id =>
+    put {
+      entity(as[StatusData]) { sd =>
+        val status = sd.status.toLowerCase
+        status match {
+          case StatusActive  => handle(userManagement.unblock(User.Id(id))) {
+            case Right(u) => respondWithHeader(
+              RawHeader(UserVersionHeader, u.metadata.version.toString)) {
+              complete(StatusCodes.NoContent)
+            }
+            case Left(err) =>  handleLeft(err) {
+              case Error.NotFound => notFound(id)
+              case Error.Deleted => gone(id)
+              case Error.Active => complete((
+                StatusCodes.Conflict,
+                Fail("Cannot unblock active user")))
+            }
+          }
+          case StatusBlocked => handle(userManagement.block(User.Id(id))) {
+            case Right(u) => respondWithHeader(
+              RawHeader(UserVersionHeader, u.metadata.version.toString)) {
+              complete(StatusCodes.NoContent)
+            }
+            case Left(err) =>  handleLeft(err) {
+              case Error.NotFound => notFound(id)
+              case Error.Deleted => gone(id)
+              case Error.Blocked => complete((
+                StatusCodes.Conflict,
+                Fail("Cannot block blocked user")))
+            }
+          }
+          case _ => complete((
+            StatusCodes.BadRequest,
+            Fail("`Active` or `Blocked` values allowed here")))
         }
       }
     }
