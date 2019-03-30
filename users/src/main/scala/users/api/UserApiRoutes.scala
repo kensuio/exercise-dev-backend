@@ -6,12 +6,11 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.get
 import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
+import users.api.RouteHandling.Fail
 import users.domain._
 import users.services.UserManagement
 import users.services.usermanagement.Error
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
-import scala.concurrent.duration._
 
 object UserApiRoutes {
 
@@ -43,11 +42,9 @@ object UserApiRoutes {
 
   final case class PasswordData(password: Option[String])
   final case class StatusData(status: String)
-
-  case class Fail(err: String)
 }
 
-trait UserApiRoutes extends JsonSupport {
+trait UserApiRoutes extends JsonSupport with RouteHandling {
 
   import UserApiRoutes._
 
@@ -87,29 +84,5 @@ trait UserApiRoutes extends JsonSupport {
         }
       }
     }
-  }
-
-  private def handle[T](
-      future: ⇒ Future[Error Either T])(
-      f: Error Either T => Route
-  ): Route =  {
-    withRequestTimeout(1.seconds) {
-      onComplete(future) {
-        case Success(r) => f(r)
-        case Failure(ex) =>
-          val msg = Option(ex.getMessage).getOrElse("Unknown Server error")
-          complete((
-            StatusCodes.InternalServerError, Fail(msg)))
-      }
-    }
-  }
-
-  private def handleLeft[T](
-      left: Error)(
-      pf: PartialFunction[Error, Route]
-  ): Route = {
-    val err = (e: Error) => complete((
-      StatusCodes.InternalServerError, Fail("Unknown Server error")))
-    pf.applyOrElse(left, err)
   }
 }

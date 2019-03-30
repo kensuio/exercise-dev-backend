@@ -12,5 +12,4 @@ trait JsonSupport extends SprayJsonSupport {
   implicit val signUpDataFormat = jsonFormat3(SignUpData)
   implicit val passwordDataFormat = jsonFormat1(PasswordData)
   implicit val statusDataFormat = jsonFormat1(StatusData)
-  implicit val failFormat = jsonFormat1(Fail)
 }
