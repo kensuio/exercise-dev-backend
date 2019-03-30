@@ -1,11 +1,12 @@
 package users.api
 
 import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.get
 import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
+import akka.http.scaladsl.server.{Route, StandardRoute}
 import users.api.RouteHandling.Fail
 import users.domain._
 import users.services.UserManagement
@@ -40,6 +41,7 @@ object UserApiRoutes {
       password: Option[String],
   )
 
+  final case class EmailData(email: String)
   final case class PasswordData(password: Option[String])
   final case class StatusData(status: String)
 }
@@ -59,10 +61,7 @@ trait UserApiRoutes extends JsonSupport with RouteHandling {
       handle(userManagement.get(User.Id(id))) {
         case Right(u) => complete((StatusCodes.OK, UserData(u)))
         case Left(err) => handleLeft(err) {
-          case Error.NotFound => complete((
-            StatusCodes.NotFound,
-            Fail(s"No user found for id: $id")
-          ))
+          case Error.NotFound => notFound(id)
         }
       }
     }
@@ -84,5 +83,29 @@ trait UserApiRoutes extends JsonSupport with RouteHandling {
         }
       }
     }
+  } ~ path("api" / apiVersion / "users" / Segment / "email") { id =>
+    put {
+      entity(as[EmailData]) { ed =>
+        handle(userManagement.updateEmail(
+          User.Id(id),
+          EmailAddress(ed.email))
+        ) {
+          case Right(u) => respondWithHeader(
+            RawHeader(UserVersionHeader, u.metadata.version.toString)) {
+              complete(StatusCodes.NoContent)
+            }
+          case Left(err) => handleLeft(err) {
+            case Error.NotFound => notFound(id)
+            case Error.Deleted => gone(id)
+          }
+        }
+      }
+    }
   }
+
+  private def notFound(id: String): StandardRoute = complete((
+      StatusCodes.NotFound, Fail(s"No user found for id: $id")))
+
+  private def gone(id: String): StandardRoute = complete((
+    StatusCodes.Gone, Fail(s"User deleted found for id: $id")))
 }

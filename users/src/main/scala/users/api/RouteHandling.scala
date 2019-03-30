@@ -1,4 +1,5 @@
 package users.api
+
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{onComplete, withRequestTimeout}
@@ -6,6 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import spray.json.DefaultJsonProtocol
 import users.services.usermanagement.Error
+import users.services.usermanagement.Error.System
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
@@ -40,8 +42,16 @@ trait RouteHandling extends SprayJsonSupport {
       left: Error)(
       pf: PartialFunction[Error, Route]
   ): Route = {
-    val err = (e: Error) => complete((
-      StatusCodes.InternalServerError, Fail("Unknown Server error")))
+    def err(e: Error): Route = e match {
+      case System(underlying) =>
+        val msg = Option(underlying)
+          .map(_.getMessage)
+          .getOrElse("Unknown Server error")
+
+        complete((StatusCodes.InternalServerError, Fail(msg)))
+      case _ => complete((
+        StatusCodes.InternalServerError, Fail("Unknown Server error")))
+    }
     pf.applyOrElse(left, err)
   }
 }
