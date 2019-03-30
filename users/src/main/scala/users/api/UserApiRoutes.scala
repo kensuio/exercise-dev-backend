@@ -11,6 +11,7 @@ import users.services.UserManagement
 import users.services.usermanagement.Error
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import scala.concurrent.duration._
 
 object UserApiRoutes {
 
@@ -58,21 +59,39 @@ trait UserApiRoutes extends JsonSupport {
 
   lazy val routes: Route = path("api" / apiVersion / "users"/ Segment) { id =>
     get {
-      onComplete(userManagement.get(User.Id(id))) {
-        case Success(Right(u)) => complete((StatusCodes.OK, UserData(u)))
-        case Success(Left(err)) => err match {
+      handle(userManagement.get(User.Id(id))) {
+        case Right(u) => complete((StatusCodes.OK, UserData(u)))
+        case Left(err) => handleLeft(err) {
           case Error.NotFound => complete((
             StatusCodes.NotFound,
             Fail(s"No user found for id: $id")
           ))
-          case _ => complete((
-            StatusCodes.InternalServerError, Fail("Unknown Server error")))
         }
-        case Failure(ex) => complete((
-          StatusCodes.InternalServerError,
-          Fail(ex.getMessage)
-        ))
       }
     }
+  }
+
+  private def handle[T](
+      future: ⇒ Future[Error Either T])(
+      f: Error Either T => Route
+  ): Route =  {
+    withRequestTimeout(1.seconds) {
+      onComplete(future) {
+        case Success(r) => f(r)
+        case Failure(ex) =>
+          val msg = Option(ex.getMessage).getOrElse("Unknown Server error")
+          complete((
+            StatusCodes.InternalServerError, Fail(msg)))
+      }
+    }
+  }
+
+  private def handleLeft[T](
+      left: Error)(
+      pf: PartialFunction[Error, Route]
+  ): Route = {
+    val err = (e: Error) => complete((
+      StatusCodes.InternalServerError, Fail("Unknown Server error")))
+    pf.applyOrElse(left, err)
   }
 }
