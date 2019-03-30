@@ -44,5 +44,4 @@ trait Algebra[F[_]] {
   ): F[Error Either Done]
 
   def all(): F[Error Either List[User]]
-
 }

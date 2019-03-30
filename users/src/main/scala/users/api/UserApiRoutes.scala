@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.get
 import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
-import users.domain.User
+import users.domain._
 import users.services.UserManagement
 import users.services.usermanagement.Error
 import scala.concurrent.Future
@@ -66,6 +66,24 @@ trait UserApiRoutes extends JsonSupport {
             StatusCodes.NotFound,
             Fail(s"No user found for id: $id")
           ))
+        }
+      }
+    }
+  } ~ path("api" / apiVersion / "users") {
+    post {
+      entity(as[SignUpData]) { su =>
+        handle(userManagement.signUp(
+          UserName(su.name),
+          EmailAddress(su.email),
+          su.password.map(Password)
+        )) {
+          case Right(u) => complete((StatusCodes.OK, UserData(u)))
+          case Left(err) => handleLeft(err) {
+            case Error.Exists => complete((
+              StatusCodes.Conflict,
+              Fail(s"User with such name already exists: ${su.name}")
+            ))
+          }
         }
       }
     }

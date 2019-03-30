@@ -18,7 +18,7 @@ private[users] class InMemoryRepository extends UserRepository {
 
   def insert(user: User): Future[Done] =
     Future.successful {
-      UserMap + (user.id → user)
+      UserMap.put(user.id, user)
       Done
     }
 
