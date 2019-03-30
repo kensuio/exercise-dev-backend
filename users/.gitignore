@@ -1,0 +1,38 @@
+bin
+build
+target
+.metadata
+.mock
+.classpath
+.gradle
+.project
+.settings
+.springBeans
+.DS_Store
+*.class
+*.MF
+out
+.DS_Store
+*.swp
+
+# Package Files #
+#*.jar
+
+
+# exept javascript test environmet
+#!*/libs
+
+
+# IntelliJ project files
+*.iml
+*.iws
+*.ipr
+.idea
+
+#winmerge backups
+*.bak
+
+#log  files
+*.log
+
+*IS_UNDEFINED
