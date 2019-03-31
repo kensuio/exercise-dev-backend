@@ -8,10 +8,10 @@ import akka.stream.ActorMaterializer
 import forex.domain._
 import forex.interfaces.api.rates.Protocol.OneForgeResponse
 import forex.interfaces.api.utils.ApiMarshallers
+import forex.services.oneforge.Error.System
 import monix.eval.Task
 import org.atnos.eff._
 import org.atnos.eff.addon.monix.task._
-
 import scala.concurrent.Future
 
 object Interpreters {
@@ -55,17 +55,17 @@ final class Live[R] private[oneforge] (
       pair: Rate.Pair
   ): Eff[R, Error Either Rate] = {
 
-    def future: Future[Rate] = {
+    def future: Future[Either[System, Rate]] = {
       Http().singleRequest(
         HttpRequest(
           uri = "https://forex.1forge.com/1.0.3/quotes?pairs=EURUSD&api_key=FSw6dDbDTfd3YyiLUzsOUR0AsfP8zfcU")
       ) flatMap  { response =>
         Unmarshal(response.entity).to[List[OneForgeResponse]].map(rs => Rate.fromOneForge(rs.head))
+      } map(Right(_)) recover {
+        case th => Left(System(th))
       }
     }
 
-    for {
-      result ← fromTask(Task.deferFuture(future))
-    } yield Right(result)
+    fromTask(Task.deferFuture(future))
   }
 }
