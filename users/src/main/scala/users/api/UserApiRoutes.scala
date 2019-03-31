@@ -24,6 +24,8 @@ object UserApiRoutes {
       version: Int
   )
 
+  final case class UserDataList(list: List[UserData])
+
   object UserData {
     def apply(u: User): UserData = UserData(
       id = u.id.value,
@@ -171,11 +173,34 @@ trait UserApiRoutes extends JsonSupport with RouteHandling {
         }
       }
     }
+  } ~ path("api" / "admin" / apiVersion / "users"/ Segment) { id =>
+    delete {
+      handle(userManagement.delete(User.Id(id))) {
+        case Right(u) => complete(StatusCodes.NoContent)
+        case Left(err) => handleLeft(err) {
+          case Error.NotFound => notFound(id)
+          case Error.Deleted => gone(id)
+          case Error.Active => complete((
+            StatusCodes.Conflict,
+            Fail("Cannot block active user")))
+        }
+      }
+    }
+  } ~ path("api" / "admin" / apiVersion / "users") {
+    get {
+      handle(userManagement.all()) {
+        case Right(us) =>
+          complete((StatusCodes.OK, UserDataList(us.map(UserData(_)))))
+        case Left(_) => complete((
+            StatusCodes.InternalServerError, Fail("Unknown Server error")))
+      }
+    }
   }
+
 
   private def notFound(id: String): StandardRoute = complete((
       StatusCodes.NotFound, Fail(s"No user found for id: $id")))
 
   private def gone(id: String): StandardRoute = complete((
-    StatusCodes.Gone, Fail(s"User deleted found for id: $id")))
+      StatusCodes.Gone, Fail(s"User deleted for id: $id")))
 }

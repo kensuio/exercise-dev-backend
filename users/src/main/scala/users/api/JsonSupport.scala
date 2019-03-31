@@ -9,6 +9,7 @@ trait JsonSupport extends SprayJsonSupport {
   import UserApiRoutes._
 
   implicit val userDataFormat = jsonFormat6(UserData.apply)
+  implicit val userDataLIst = jsonFormat1(UserDataList)
   implicit val signUpDataFormat = jsonFormat3(SignUpData)
   implicit val passwordDataFormat = jsonFormat1(PasswordData)
   implicit val emailFormay = jsonFormat1(EmailData)
