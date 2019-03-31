@@ -3,15 +3,15 @@
 
 __Assumptions made__
 
-1. Password. Passwords passed via secured network and store it directly
+1. Passwords passed via secured network and stored directly
 
-2. User filed `userName` is unique.
+2. User field `userName` is unique.
 
 3. It is possible for different `userName`s to have the same `emailAddress`.
 
 4. User role is defined (ex.: by auth layer) for each request.
 
-5. We treat `version` of user from metadat as meter of `Backward compatibility`
+5. We treat `version` of user from `user metadata` as a meter of `Backward compatibility`
 
 6. All data valid (ex: email)
 
