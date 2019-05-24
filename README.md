@@ -13,11 +13,14 @@ You can do this however you see fit - you can email us a tarball, a pointer to d
 Make sure your submission includes a **README**, documenting any assumptions, simplifications and/or choices you made, as well as a short description of how to run the code and/or tests. Finally, to help us review your code, please split your commit history in sensible chunks (at least separate the initial provided code from your personal additions).
 
 ## The Exercises:
+### Junior Developer
+The complete specification for this exercise can be found in the [junior-challenge.md](junior/junior-challenge.md).
+
 ### 1. [Platform] Build an API for managing users
-The complete specification for this exercise can be found in the [UsersAPI.md](UsersAPI.md).
+The complete specification for this exercise can be found in the [UsersAPI.md](users/UsersAPI.md).
 
 ### 2. [Platform] Build a local proxy for currency exchange rates
-The complete specification for this exercise can be found in the [Forex.md](Forex.md).
+The complete specification for this exercise can be found in the [Forex.md](forex/Forex.md).
 
 ## F.A.Q.
 1) _Is it OK to share your solutions publicly?_
