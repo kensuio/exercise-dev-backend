@@ -10,16 +10,35 @@ We expect that the amount of effort to do any of these exercises is in the range
 
 ## How to submit?
 You can do this however you see fit - you can email us a tarball, a pointer to download your code from somewhere or just a link to a source control repository.
-
 Make sure your submission includes a **README**, documenting any assumptions, simplifications and/or choices you made, as well as a short description of how to run the code and/or tests. Finally, to help us review your code, please split your commit history in sensible chunks (at least separate the initial provided code from your personal additions).
 
+## The Exercises:
+<<<<<<< HEAD
+### Junior Developer
+The complete specification for this exercise can be found in the [junior-challenge.md](junior/junior-challenge.md).
+
+### 1. [Platform] Build an API for managing users
+The complete specification for this exercise can be found in the [UsersAPI.md](users/UsersAPI.md).
+
+### 2. [Platform] Build a local proxy for currency exchange rates
+=======
+
+### [Junior Backend Developer] Built Json Transformer API
+The complete specification for this exercise can be found in the [junior-challenge.md](junior/junior-challenge.md).
+
+### [Platform Engineer] Build an API for managing users
+The complete specification for this exercise can be found in the [UsersAPI.md](users/UsersAPI.md).
+
+### [Platform Engineer] Build a local proxy for currency exchange rates
+>>>>>>> 08d0a1018970efdc9c06ec80295193ed9b8e4d31
+The complete specification for this exercise can be found in the [Forex.md](forex/Forex.md).
 
 ## F.A.Q.
 1) _Is it OK to share your solutions publicly?_
 Yes, the questions are not prescriptive, the process and discussion around the code is the valuable part. You do the work, you own the code. Given we are asking you to give up your time, it is entirely reasonable for you to keep and use your solution as you see fit.
 
 2) _Should I do X?_
-For any value of X, it is up to you, we intentionally leave the problems a little open-ended and will leave it up to you to provide us with what you see as important. Just remember the rough time frame of the project. If it is going to take you a couple of days, it isn't essential.
+For any value of X, it is up to you, we intentionally leave the problem a little open-ended and will leave it up to you to provide us with what you see as important. Just remember the rough time frame of the project. If it is going to take you a couple of days, it isn't essential.
 
 3) _Something is ambiguous, and I don't know what to do?_
 The first thing is: don't get stuck. We really don't want to trip you up intentionally, we are just attempting to see how you approach problems. That said, there are intentional ambiguities in the specifications, mainly to see how you fill in those gaps, and how you make design choices.

@@ -1,0 +1,31 @@
+[
+  {
+    "carrier_name": "CollectTimes", "base_price": 50, "services":
+    [
+      { "delivery_time": 1, "markup": 20, "vehicles": ["parcel_car", "small_van", "large_van"] },
+      { "delivery_time": 3, "markup": 10, "vehicles": ["parcel_car", "motorbike"] },
+      { "delivery_time": 5, "markup": 5, "vehicles": ["bicycle", "motorbike"] }
+    ]
+  },
+  {
+    "carrier_name": "RoyalPackages", "base_price": 30, "services":
+    [
+      { "delivery_time": 3, "markup": 5, "vehicles": ["bicycle", "motorbike", "parcel_car"] },
+      { "delivery_time": 1, "markup": 50, "vehicles": ["bicycle", "motorbike", "parcel_car", "small_van", "large_van"] }
+    ]
+  },
+  {
+    "carrier_name": "Hercules", "base_price": 25, "services":
+    [
+      { "delivery_time": 5, "markup": 10, "vehicles": ["motorbike", "parcel_car", "small_van"] },
+      { "delivery_time": 10, "markup": 0, "vehicles": ["large_van", "parcel_car", "bicycle"] }
+    ]
+  },
+  {
+    "carrier_name": "OOPS", "base_price": 0, "services":
+    [
+      { "delivery_time": 12, "markup": 0, "vehicles": ["large_van", "parcel_car", "bicycle"] },
+      { "delivery_time": 7, "markup": 0, "vehicles": ["large_van", "motorbike", "parcel_car", "small_van"] }
+    ]
+  }
+]
