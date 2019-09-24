@@ -106,3 +106,5 @@ Example response:
   ]
 }
 ```
+
+### 3) (Optional) Secure this endpoint with TLS/ Https, or at least explain how you'd do it.
