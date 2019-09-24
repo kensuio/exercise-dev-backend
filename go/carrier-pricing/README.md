@@ -7,7 +7,7 @@ The purpose of this test is to ensure you have some basic knowledge of Golang in
 ## Deliverable
 
 - The source code of the server, with simple build instructions.
-- All necessary script to create and seed the different databases.
+- All necessary script to create and seed the different databases IF NECESSARY.
 - The software will be compiled with the latest go version.
 - The software and its ecosystem will be run and tested on a local computer.
 
@@ -18,7 +18,7 @@ _Note: Use only the standard lib, except for the database drivers._
 
 ### Basic Service
 
-Build a basic service that responds to a POST to /quotes, with the following request structure:
+Build a basic service that responds to a POST request to an endpoint called /quotes, with the following request structure:
 
 ```
 {
