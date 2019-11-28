@@ -12,7 +12,8 @@ The purpose of this test is to ensure you have some basic knowledge of Golang in
 - The software and its ecosystem will be run and tested on a local computer.
 
 _Note: You can use Docker and docker-compose to provide the databases._
-_Note: Use only the standard lib, except for the database drivers._
+
+_Note: Ideally, you can should only use only the standard lib, except for the database drivers. But if you have a better library to complete the exercise, justify so. _
 
 
 
