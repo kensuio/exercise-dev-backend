@@ -1,7 +1,7 @@
 package forex.main
 
 import akka.actor._
-import akka.stream._
+import akka.stream.Materializer
 import cats.Eval
 import forex.config._
 import org.zalando.grafter._
@@ -16,8 +16,7 @@ case class ActorSystems(
   implicit lazy val system: ActorSystem =
     ActorSystem(config.name)
 
-  implicit lazy val materializer: Materializer =
-    ActorMaterializer()(system)
+  implicit lazy val materializer: Materializer = Materializer.matFromSystem
 
   override def start: Eval[StartResult] =
     StartResult.eval("ActorSystems") {

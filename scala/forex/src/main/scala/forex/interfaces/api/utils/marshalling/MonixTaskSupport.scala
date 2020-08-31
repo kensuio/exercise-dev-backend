@@ -14,7 +14,7 @@ trait MonixTaskSupport {
       m: ToResponseMarshaller[Future[T]]
   ): ToResponseMarshaller[Task[T]] =
     Marshaller[Task[T], HttpResponse] { implicit ec ⇒ task ⇒
-      val res = task.runAsync(Scheduler(ec))
+      val res = task.runToFuture(Scheduler(ec))
       m(res)
     }
 

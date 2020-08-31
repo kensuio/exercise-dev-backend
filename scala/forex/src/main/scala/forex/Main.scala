@@ -5,12 +5,14 @@ import com.typesafe.scalalogging._
 import forex.config._
 import forex.main._
 import org.zalando.grafter._
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
 
 object Main extends App with LazyLogging {
 
   var app: Option[Application] = None
 
-  pureconfig.loadConfig[ApplicationConfig]("app") match {
+  ConfigSource.default.at("app").load[ApplicationConfig] match {
     case Left(errors) ⇒
       logger.error(s"Errors loading the configuration:\n${errors.toList.mkString("- ", "\n- ", "")}")
     case Right(applicationConfig) ⇒
