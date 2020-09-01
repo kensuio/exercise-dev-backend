@@ -2,7 +2,6 @@ package forex.domain
 
 import io.circe._
 import io.circe.generic.extras.wrapped._
-import io.circe.java8.time._
 
 import java.time.OffsetDateTime
 
