@@ -13,7 +13,7 @@ The purpose of this test is to ensure you have some basic knowledge of Golang in
 
 _Note: You can use Docker and docker-compose to provide the databases._
 
-_Note: Ideally, you should only use only the standard lib, except for the database drivers. But if you feel that a better library to complete the exercise is available to you, just explain why it's better suited ._
+_Note: Ideally, you should only use the standard lib, except for the database drivers. If you feel that a better library to complete the exercise is available to you, just explain why it's better suited ._
 
 
 
