@@ -19,7 +19,7 @@ please split your commit history in sensible chunks (at least separate the initi
 ## GO role exercises
 
 ### [Backend Developer] Built an API for managing prices
-The complete specification for this exercise can be found in the [carrier-data.md](go/carrier-pricing/README.md).
+The complete specification for this exercise can be found in the [carrier-data.md](go/carrier-pricing/carrier-data.md).
 
 ## Scala role exercises
 
