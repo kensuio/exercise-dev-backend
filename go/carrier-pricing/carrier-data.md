@@ -83,7 +83,7 @@ Now we need the list of prices per carrier for the given `pickup_postcode`, `del
 Use the JSON file  `src/data` folder to fetch the carrier data and calculate the price.
 Bear in mind the carrier service should support the vehicle type. When calculating the price, add the service markup as well as the vehicle markup you have implemented in the earlier exercise to the carrier base price.
 
-The `price_list` array needs to contain JSON objects sorted by `price`. And be stored in a database of your choosing (Postgres, redis, SQLLite, etc).
+The `price_list` array needs to contain JSON objects sorted by `price`. And be stored in a database of your choosing (Postgres, MySQL, redis, SQLLite, etc).
 
 Example request:
 ```
