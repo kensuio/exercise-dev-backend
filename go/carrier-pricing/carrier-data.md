@@ -43,8 +43,6 @@ The price we charge depends on the distance between two postcodes. We are not im
 
 If you have a better idea for a deterministic way of making a number from two postcodes, please feel free to use that instead. Update your service to calculate pricing based upon these rules.
 
-The requests should be logged at least on the consoles, and we expect to have some tests (unit adn/or integration).
-
 ## Features to complete
 
 ### 1) Simple variable prices by vehicle
