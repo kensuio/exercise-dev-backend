@@ -107,5 +107,7 @@ Example response:
   ]
 }
 ```
+### 3) Create an HTTP client that fetch the price list information and write it to the console
 
-### 3) (Optional) Secure this endpoint with TLS/ Https, or at least explain how you'd do it.
+### 4) Add unit tests for both endpoints
+### 5) (Optional) Secure this endpoint with TLS/ Https, or at least explain how you'd do it.
