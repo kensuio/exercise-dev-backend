@@ -43,8 +43,6 @@ The price we charge depends on the distance between the two postcodes. We are no
 
 If you have a better idea for a deterministic way of making a number from two postcodes, please feel free to use that instead. Update your service to calculate pricing based upon these rules.
 
-The requests should be logged at least on the consoles, and we expect to have tests (unit and/or integration).
-
 ## Features to complete
 
 ### 1) Simple variable prices by vehicle
@@ -85,7 +83,7 @@ Now we need the list of prices per carrier for the given `pickup_postcode`, `del
 Use the JSON file  `src/data` folder to fetch the carrier data and calculate the price.
 Bear in mind the carrier service should support the vehicle type. When calculating the price, add the service markup as well as the vehicle markup you have implemented in the earlier exercise to the carrier base price.
 
-The `price_list` array needs to contain JSON objects sorted by `price`. And be stored in a database of your choosing (Postgres, MySQL, Redis, SQLite, etc).
+The `price_list` array needs to contain JSON objects sorted by `price`. And be stored in a database of your choosing (Postgres, MySQL, redis, SQLite, etc).
 
 Example request:
 ```
@@ -107,5 +105,7 @@ Example response:
   ]
 }
 ```
+### 3) Create an HTTP client that fetch the price list information and write the JSON response to the console
 
-### 3) (Optional) Secure this endpoint with TLS/HTTPS, or at least explain how you'd do it.
+### 4) Add unit tests (client and server endpoints)
+### 5) (Optional) Secure this endpoint with TLS/Https, or at least explain how you'd do it.
