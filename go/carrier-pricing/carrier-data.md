@@ -36,7 +36,7 @@ And responds with the following price:
 }
 ```
 
-The price we charge depends on the distance between two postcodes. We are not implementing postcode geocoding here, instead we are using basic formula for working out the price for a quote between two postcodes. The process is to take the base-36 integer of each postcode, subtract the delivery postcode from the pickup postcode and then divide by some large number. If the result is negative, turn it into a positive.
+The price we charge depends on the distance between the two postcodes. We are not implementing postcode geocoding here, instead we are using a basic formula for working out the price for a quote between two postcodes. The process is to take the base-36 integer of each postcode, subtract the delivery postcode from the pickup postcode and then divide by some large number. If the result is negative, turn it into a positive.
 
 
 `Base64("SW1A1AA", 36) - Base64("EC2A3LT", 36)`
@@ -83,7 +83,7 @@ Now we need the list of prices per carrier for the given `pickup_postcode`, `del
 Use the JSON file  `src/data` folder to fetch the carrier data and calculate the price.
 Bear in mind the carrier service should support the vehicle type. When calculating the price, add the service markup as well as the vehicle markup you have implemented in the earlier exercise to the carrier base price.
 
-The `price_list` array needs to contain JSON objects sorted by `price`. And be stored in a database of your choosing (Postgres, redis, SQLLite, etc).
+The `price_list` array needs to contain JSON objects sorted by `price`. And be stored in a database of your choosing (Postgres, MySQL, redis, SQLLite, etc).
 
 Example request:
 ```
