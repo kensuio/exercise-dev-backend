@@ -36,7 +36,7 @@ And responds with the following price:
 }
 ```
 
-The price we charge depends on the distance between two postcodes. We are not implementing postcode geocoding here, instead we are using basic formula for working out the price for a quote between two postcodes. The process is to take the base-36 integer of each postcode, subtract the delivery postcode from the pickup postcode and then divide by some large number. If the result is negative, turn it into a positive.
+The price we charge depends on the distance between the two postcodes. We are not implementing postcode geocoding here, instead we are using a basic formula for working out the price for a quote between two postcodes. The process is to take the base-36 integer of each postcode, subtract the delivery postcode from the pickup postcode and then divide by some large number. If the result is negative, turn it into a positive.
 
 
 `Base64("SW1A1AA", 36) - Base64("EC2A3LT", 36)`
