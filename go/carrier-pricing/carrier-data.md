@@ -7,7 +7,7 @@ The purpose of this test is to ensure you have some basic knowledge of Golang in
 ## Deliverable
 
 - The source code of the server, with simple build instructions.
-- All necessary scripts to create and seed the different databases IF NECESSARY.
+- All necessary scripts to create and seed the different databases _IF NECESSARY_.
 - The software will be compiled with the latest go version.
 - The software and its ecosystem will be run and tested on a local computer.
 
@@ -19,16 +19,16 @@ _Note: Ideally, you should only use the standard lib, except for the database dr
 
 ### Basic Service
 
-Build a basic service that responds to a POST request to an endpoint called /quotes, with the following request structure:
+Build a basic service that responds to a POST request to an endpoint called `/quotes`, with the following request structure:
 
-```
+```js
 {
   "pickup_postcode":   "SW1A1AA",
   "delivery_postcode": "EC2A3LT"
 }
 ```
 And responds with the following price:
-```
+```js
 {
   "pickup_postcode":   "SW1A1AA",
   "delivery_postcode": "EC2A3LT",
@@ -59,20 +59,20 @@ For example, if the base price was 100, the `small_van` price with markup will b
 The vehicle should also be returned in the response, and the price should be rounded to the nearest integer.
 
 Request:
-```
+```js
 {
   "pickup_postcode":   "SW1A1AA",
   "delivery_postcode": "EC2A3LT",
-  "vehicle": "bicycle"
+  "vehicle":           "bicycle"
 }
 ```
 Response:
-```
+```js
 {
   "pickup_postcode":   "SW1A1AA",
   "delivery_postcode": "EC2A3LT"
-  "vehicle": "bicycle"
-  "price": 348
+  "vehicle":           "bicycle"
+  "price":             348
 }
 ```
 
@@ -86,22 +86,22 @@ Bear in mind the carrier service should support the vehicle type. When calculati
 The `price_list` array needs to contain JSON objects sorted by `price`. And be stored in a database of your choosing (Postgres, MySQL, redis, SQLite, etc).
 
 Example request:
-```
+```js
 {
   "pickup_postcode":   "SW1A1AA",
   "delivery_postcode": "EC2A3LT",
-  "vehicle": "small_van"
+  "vehicle":           "small_van"
 }
 ```
 Example response:
-```
+```js
 {
   "pickup_postcode":   "SW1A1AA",
   "delivery_postcode": "EC2A3LT"
-  "vehicle": "small_van"
+  "vehicle":           "small_van"
   "price_list": [
     {"service": "RoyalPackages", "price": 300, "delivery_time": 5}
-    {"service": "Hercules", "price": 500, "delivery_time": 2},
+    {"service": "Hercules",      "price": 500, "delivery_time": 2},
   ]
 }
 ```
