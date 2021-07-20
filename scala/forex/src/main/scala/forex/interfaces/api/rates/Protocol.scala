@@ -1,7 +1,5 @@
 package forex.interfaces.api.rates
 
-import java.time.OffsetDateTime
-
 import forex.domain._
 import io.circe._
 import io.circe.generic.semiauto._

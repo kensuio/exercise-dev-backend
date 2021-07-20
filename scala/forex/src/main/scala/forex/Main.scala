@@ -1,40 +1,60 @@
 package forex
 
-import cats.Eval
-import com.typesafe.scalalogging._
+import akka.actor.ActorSystem
+import akka.http.scaladsl.server.Route
+import com.typesafe.config.{ Config, ConfigFactory }
 import forex.config._
+import forex.interfaces.api.Api
+import forex.interfaces.api.rates.RatesApi
 import forex.main._
-import org.zalando.grafter._
-import pureconfig.ConfigSource
+import forex.main.HttpServer.HttpServer
+import forex.processes.rates.RatesService
+import forex.services.oneforge.OneForge
 import pureconfig.generic.auto._
+import zio._
+import zio.config.syntax._
+import zio.config.typesafe.TypesafeConfig
+import zio.logging.{ LogAnnotation, Logging }
+import zio.logging.slf4j.Slf4jLogger
 
-object Main extends App with LazyLogging {
+object Main extends App {
 
-  var app: Option[Application] = None
+  def run(args: List[String]): URIO[ZEnv, ExitCode] =
+    ZIO(ConfigFactory.load.resolve)
+      .flatMap(rawConfig => program.provideCustomLayer(prepareEnvironment(rawConfig)))
+      .exitCode
 
-  ConfigSource.default.at("app").load[ApplicationConfig] match {
-    case Left(errors) ⇒
-      logger.error(s"Errors loading the configuration:\n${errors.toList.mkString("- ", "\n- ", "")}")
-    case Right(applicationConfig) ⇒
-      val application = configure[Application](applicationConfig).configure()
+  private val program: RIO[HttpServer with ZEnv, Unit] =
+    HttpServer.start.useForever
 
-      Rewriter
-        .startAll(application)
-        .flatMap {
-          case results if results.exists(!_.success) ⇒
-            logger.error(toStartErrorString(results))
-            Rewriter.stopAll(application).map(_ ⇒ ())
-          case results ⇒
-            logger.info(toStartSuccessString(results))
-            Eval.now {
-              app = Some(application)
-            }
-        }
-        .value
+  private def prepareEnvironment(rawConfig: Config): TaskLayer[HttpServer] = {
+    val configLayer = TypesafeConfig.fromTypesafeConfig(rawConfig, ApplicationConfig.descriptor)
+
+    val actorSystemLayer: TaskLayer[Has[ActorSystem]] = ZLayer.fromManaged {
+      ZManaged.make(ZIO(ActorSystem("forex-system")))(s => ZIO.fromFuture(_ => s.terminate()).either)
+    }
+
+    val loggingLayer: ULayer[Logging] = Slf4jLogger.make { (context, message) =>
+      val logFormat = "[correlation-id = %s] %s"
+      val correlationId = LogAnnotation.CorrelationId.render(context.get(LogAnnotation.CorrelationId))
+      logFormat.format(correlationId, message)
+    }
+
+    val oneForge = OneForge.dummy
+
+    val ratesService = oneForge >>> RatesService.oneForge
+
+    val ratesApi = ratesService >>> RatesApi.live
+
+    val apiLayer: TaskLayer[Has[Api]] =
+      (configLayer ++ actorSystemLayer ++ loggingLayer ++ ratesApi) >>> Api.live
+
+    val routesLayer: URLayer[Has[Api], Has[Route]] =
+      ZLayer.fromService(_.routes)
+
+    val serverEnv: TaskLayer[HttpServer] =
+      (actorSystemLayer ++ configLayer.narrow(_.api) ++ (apiLayer >>> routesLayer) ++ loggingLayer) >>> HttpServer.live
+
+    serverEnv
   }
-
-  sys.addShutdownHook {
-    app.foreach(Rewriter.stopAll(_))
-  }
-
 }

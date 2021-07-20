@@ -16,27 +16,27 @@ object Currency {
   final case object USD extends Currency
 
   implicit val show: Show[Currency] = Show.show {
-    case AUD ⇒ "AUD"
-    case CAD ⇒ "CAD"
-    case CHF ⇒ "CHF"
-    case EUR ⇒ "EUR"
-    case GBP ⇒ "GBP"
-    case NZD ⇒ "NZD"
-    case JPY ⇒ "JPY"
-    case SGD ⇒ "SGD"
-    case USD ⇒ "USD"
+    case AUD => "AUD"
+    case CAD => "CAD"
+    case CHF => "CHF"
+    case EUR => "EUR"
+    case GBP => "GBP"
+    case NZD => "NZD"
+    case JPY => "JPY"
+    case SGD => "SGD"
+    case USD => "USD"
   }
 
   def fromString(s: String): Currency = s match {
-    case "AUD" | "aud" ⇒ AUD
-    case "CAD" | "cad" ⇒ CAD
-    case "CHF" | "chf" ⇒ CHF
-    case "EUR" | "eur" ⇒ EUR
-    case "GBP" | "gbp" ⇒ GBP
-    case "NZD" | "nzd" ⇒ NZD
-    case "JPY" | "jpy" ⇒ JPY
-    case "SGD" | "sgd" ⇒ SGD
-    case "USD" | "usd" ⇒ USD
+    case "AUD" | "aud" => AUD
+    case "CAD" | "cad" => CAD
+    case "CHF" | "chf" => CHF
+    case "EUR" | "eur" => EUR
+    case "GBP" | "gbp" => GBP
+    case "NZD" | "nzd" => NZD
+    case "JPY" | "jpy" => JPY
+    case "SGD" | "sgd" => SGD
+    case "USD" | "usd" => USD
   }
 
   implicit val encoder: Encoder[Currency] =
