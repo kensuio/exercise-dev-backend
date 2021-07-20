@@ -1,7 +1,7 @@
 package forex.processes.rates
 
 import forex.domain._
-import forex.services.oneforge.{ OneForge, OneForgeError }
+import forex.services.oneforge.{OneForge, OneForgeError}
 import zio._
 
 trait RatesService {
@@ -15,10 +15,10 @@ final case class OneForgeRatesService(oneForge: OneForge) extends RatesService {
     oneForge.get(Rate.Pair(request.from, request.to)).mapError(toProcessError)
 
   private def toProcessError[T <: Throwable](t: T): RatesError = t match {
-    case OneForgeError.Generic => RatesError.Generic
+    case OneForgeError.Generic     => RatesError.Generic
     case OneForgeError.System(err) => RatesError.System(err)
-    case e: RatesError => e
-    case e => RatesError.System(e)
+    case e: RatesError             => e
+    case e                         => RatesError.System(e)
   }
 }
 

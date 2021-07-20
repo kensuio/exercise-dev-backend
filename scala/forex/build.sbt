@@ -17,7 +17,7 @@ scalacOptions ++= Seq(
   "-Xlint:-unused"
 )
 
-// Needed for tests written in zio-tests
+// Needed for tests written with zio-tests
 Test / testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
 
 val zioVersion = "1.0.9"
@@ -34,13 +34,12 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.github.pureconfig" %% "pureconfig"           % "0.13.0",
-  "com.typesafe.akka"     %% "akka-stream"          % "2.6.14",
-  "com.typesafe.akka"     %% "akka-http"            % "10.2.4",
-  "de.heikoseeberger"     %% "akka-http-circe"      % "1.37.0",
-  "io.circe"              %% "circe-core"           % "0.14.1",
-  "io.circe"              %% "circe-generic"        % "0.14.1",
-  "io.circe"              %% "circe-generic-extras" % "0.14.1",
-  "io.circe"              %% "circe-jawn"           % "0.14.1",
-  "ch.qos.logback"        % "logback-classic"       % "1.2.3"
+  "com.typesafe.akka" %% "akka-stream"          % "2.6.14",
+  "com.typesafe.akka" %% "akka-http"            % "10.2.4",
+  "de.heikoseeberger" %% "akka-http-circe"      % "1.37.0",
+  "io.circe"          %% "circe-core"           % "0.14.1",
+  "io.circe"          %% "circe-generic"        % "0.14.1",
+  "io.circe"          %% "circe-generic-extras" % "0.14.1",
+  "io.circe"          %% "circe-jawn"           % "0.14.1",
+  "ch.qos.logback"    % "logback-classic"       % "1.2.3"
 )

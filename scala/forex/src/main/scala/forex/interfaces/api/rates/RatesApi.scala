@@ -1,10 +1,10 @@
 package forex.interfaces.api.rates
 
 import akka.http.scaladsl._
-import akka.http.scaladsl.server.{ Directives, Route }
+import akka.http.scaladsl.server.{Directives, Route}
 import forex.domain.Currency
 import forex.interfaces.api.utils.ApiMarshallers
-import forex.processes.rates.{ RatesError, RatesService }
+import forex.processes.rates.{RatesError, RatesService}
 import zio._
 
 trait RatesApi {
@@ -12,7 +12,7 @@ trait RatesApi {
 }
 
 final case class DefaultRatesApi(
-    ratesService: RatesService
+  ratesService: RatesService
 ) extends RatesApi
     with Directives
     with ApiMarshallers {
@@ -38,7 +38,7 @@ final case class DefaultRatesApi(
   private def getApiRequest: server.Directive1[GetApiRequest] =
     for {
       from <- parameter(Symbol("from").as(currency))
-      to <- parameter(Symbol("to").as(currency))
+      to   <- parameter(Symbol("to").as(currency))
     } yield GetApiRequest(from, to)
 }
 

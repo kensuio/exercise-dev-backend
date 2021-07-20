@@ -1,6 +1,6 @@
 package forex.interfaces.api
 
-import akka.http.scaladsl.server.{ Directives, Route }
+import akka.http.scaladsl.server.{Directives, Route}
 import forex.interfaces.api.rates.RatesApi
 import forex.interfaces.api.utils._
 import zio._

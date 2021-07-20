@@ -4,8 +4,8 @@ import zio.config.magnolia.DeriveConfigDescriptor
 import zio.duration.Duration
 
 final case class ApplicationConfig(
-    akka: AkkaConfig,
-    api: ApiConfig
+  akka: AkkaConfig,
+  api: ApiConfig
 )
 
 object ApplicationConfig {
@@ -13,15 +13,15 @@ object ApplicationConfig {
 }
 
 final case class AkkaConfig(
-    name: String,
-    exitJvmTimeout: Option[Duration]
+  name: String,
+  exitJvmTimeout: Option[Duration]
 )
 
 final case class ApiConfig(
-    interface: String,
-    port: Int
+  interface: String,
+  port: Int
 )
 
 final case class ExecutorsConfig(
-    default: String
+  default: String
 )

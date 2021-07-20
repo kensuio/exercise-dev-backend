@@ -11,9 +11,9 @@ object Converters {
 
   def toGetApiResponse(rate: Rate): GetApiResponse =
     GetApiResponse(
-      from = rate.pair.from,
-      to = rate.pair.to,
-      price = rate.price,
+      from      = rate.pair.from,
+      to        = rate.pair.to,
+      price     = rate.price,
       timestamp = rate.timestamp
     )
 }

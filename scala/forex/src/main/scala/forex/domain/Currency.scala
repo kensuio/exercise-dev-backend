@@ -4,6 +4,7 @@ import cats.Show
 import io.circe._
 
 sealed trait Currency
+
 object Currency {
   final case object AUD extends Currency
   final case object CAD extends Currency
@@ -40,6 +41,6 @@ object Currency {
   }
 
   implicit val encoder: Encoder[Currency] =
-    Encoder.instance[Currency] { show.show _ andThen Json.fromString }
+    Encoder.instance[Currency](show.show _ andThen Json.fromString)
 
 }

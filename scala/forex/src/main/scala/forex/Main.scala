@@ -2,7 +2,7 @@ package forex
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 import forex.config._
 import forex.interfaces.api.Api
 import forex.interfaces.api.rates.RatesApi
@@ -10,11 +10,10 @@ import forex.main._
 import forex.main.HttpServer.HttpServer
 import forex.processes.rates.RatesService
 import forex.services.oneforge.OneForge
-import pureconfig.generic.auto._
 import zio._
 import zio.config.syntax._
 import zio.config.typesafe.TypesafeConfig
-import zio.logging.{ LogAnnotation, Logging }
+import zio.logging.{LogAnnotation, Logging}
 import zio.logging.slf4j.Slf4jLogger
 
 object Main extends App {
@@ -35,7 +34,7 @@ object Main extends App {
     }
 
     val loggingLayer: ULayer[Logging] = Slf4jLogger.make { (context, message) =>
-      val logFormat = "[correlation-id = %s] %s"
+      val logFormat     = "[correlation-id = %s] %s"
       val correlationId = LogAnnotation.CorrelationId.render(context.get(LogAnnotation.CorrelationId))
       logFormat.format(correlationId, message)
     }

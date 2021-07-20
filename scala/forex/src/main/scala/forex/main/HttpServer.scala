@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import forex.config.ApiConfig
 import zio._
-import zio.logging.{ Logger, Logging }
+import zio.logging.{Logger, Logging}
 
 object HttpServer {
 
@@ -26,9 +26,7 @@ object HttpServer {
               ZIO
                 .fromFuture(_ => Http().newServerAt(cfg.interface, cfg.port).bind(routes))
                 .zipLeft(log.info(s"Server online at http://${cfg.interface}:${cfg.port}"))
-            )(
-              b => ZIO.fromFuture(_ => b.unbind()).orDie
-            )
+            )(b => ZIO.fromFuture(_ => b.unbind()).orDie)
       }
     }
 

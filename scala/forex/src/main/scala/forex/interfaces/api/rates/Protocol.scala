@@ -7,15 +7,15 @@ import io.circe.generic.semiauto._
 object Protocol {
 
   final case class GetApiRequest(
-      from: Currency,
-      to: Currency
+    from: Currency,
+    to: Currency
   )
 
   final case class GetApiResponse(
-      from: Currency,
-      to: Currency,
-      price: Price,
-      timestamp: Timestamp
+    from: Currency,
+    to: Currency,
+    price: Price,
+    timestamp: Timestamp
   )
 
   object GetApiResponse {

@@ -13,7 +13,7 @@ package rates {
   }
 
   final case class GetRequest(
-      from: Currency,
-      to: Currency
+    from: Currency,
+    to: Currency
   )
 }
