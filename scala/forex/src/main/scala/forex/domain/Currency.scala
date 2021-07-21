@@ -1,7 +1,6 @@
 package forex.domain
 
-import cats.Show
-import io.circe._
+import zio.json.JsonEncoder
 
 sealed trait Currency
 
@@ -16,7 +15,7 @@ object Currency {
   final case object SGD extends Currency
   final case object USD extends Currency
 
-  implicit val show: Show[Currency] = Show.show {
+  def toString(c: Currency) = c match {
     case AUD => "AUD"
     case CAD => "CAD"
     case CHF => "CHF"
@@ -40,7 +39,5 @@ object Currency {
     case "USD" | "usd" => USD
   }
 
-  implicit val encoder: Encoder[Currency] =
-    Encoder.instance[Currency](show.show _ andThen Json.fromString)
-
+  implicit val encoder: JsonEncoder[Currency] = JsonEncoder[String].xmap(fromString, toString)
 }

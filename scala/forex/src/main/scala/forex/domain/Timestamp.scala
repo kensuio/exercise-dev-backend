@@ -2,16 +2,13 @@ package forex.domain
 
 import java.time.OffsetDateTime
 
-import io.circe._
-import io.circe.generic.extras.semiauto.deriveUnwrappedEncoder
+import zio.json.JsonEncoder
 
 final case class Timestamp(value: OffsetDateTime) extends AnyVal
 
 object Timestamp {
 
-  def now: Timestamp =
-    Timestamp(OffsetDateTime.now)
+  def now: Timestamp = Timestamp(OffsetDateTime.now)
 
-  implicit val encoder: Encoder[Timestamp] =
-    deriveUnwrappedEncoder[Timestamp]
+  implicit val encoder: JsonEncoder[Timestamp] = JsonEncoder[OffsetDateTime].contramap(_.value)
 }

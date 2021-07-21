@@ -4,7 +4,7 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.server.{Directives, Route}
 import forex.domain.Currency
 import forex.interfaces.api.utils.ApiMarshallers
-import forex.processes.rates.{RatesError, RatesService}
+import forex.processes.rates.RatesService
 import zio._
 
 trait RatesApi {
@@ -27,11 +27,11 @@ final case class DefaultRatesApi(
   override def routes: Route =
     get {
       getApiRequest { req =>
-        val a: IO[RatesError, GetApiResponse] = ratesService
-          .get(toGetRequest(req))
-          .map(result => toGetApiResponse(result))
-
-        complete(a)
+        complete {
+          ratesService
+            .get(toGetRequest(req))
+            .map(result => toGetApiResponse(result))
+        }
       }
     }
 

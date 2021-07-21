@@ -1,6 +1,6 @@
 package forex.interfaces.api.utils
 
-import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
-import marshalling._
+import de.heikoseeberger.akkahttpziojson.ZioJsonSupport
+import forex.interfaces.api.utils.marshalling._
 
-trait ApiMarshallers extends ZioSupport with ErrorAccumulatingCirceSupport
+trait ApiMarshallers extends ZioSupport with ZioJsonSupport

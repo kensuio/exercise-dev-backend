@@ -1,8 +1,7 @@
 package forex.interfaces.api.rates
 
 import forex.domain._
-import io.circe._
-import io.circe.generic.semiauto._
+import zio.json.{DeriveJsonEncoder, JsonEncoder}
 
 object Protocol {
 
@@ -19,7 +18,7 @@ object Protocol {
   )
 
   object GetApiResponse {
-    implicit val encoder: Encoder[GetApiResponse] = deriveEncoder[GetApiResponse]
+    implicit val encoder: JsonEncoder[GetApiResponse] = DeriveJsonEncoder.gen[GetApiResponse]
   }
 
 }

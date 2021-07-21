@@ -1,9 +1,8 @@
 package forex.domain
 
-import io.circe._
-import io.circe.generic.semiauto._
+import zio.json.{DeriveJsonEncoder, JsonEncoder}
 
-case class Rate(
+final case class Rate(
   pair: Rate.Pair,
   price: Price,
   timestamp: Timestamp
@@ -18,10 +17,8 @@ object Rate {
 
   object Pair {
 
-    implicit val encoder: Encoder[Pair] =
-      deriveEncoder[Pair]
+    implicit val encoder: JsonEncoder[Pair] = DeriveJsonEncoder.gen[Pair]
   }
 
-  implicit val encoder: Encoder[Rate] =
-    deriveEncoder[Rate]
+  implicit val encoder: JsonEncoder[Rate] = DeriveJsonEncoder.gen[Rate]
 }
