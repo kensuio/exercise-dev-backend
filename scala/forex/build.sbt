@@ -1,38 +1,42 @@
 name := "forex"
 version := "1.0.0"
 
-scalaVersion := "2.12.12"
+scalaVersion := "2.13.6"
 scalacOptions ++= Seq(
+  "-unchecked",
   "-deprecation",
-  "-encoding",
-  "UTF-8",
   "-feature",
   "-language:existentials",
   "-language:higherKinds",
-  "-Ypartial-unification",
-  "-language:experimental.macros",
-  "-language:implicitConversions"
+  "-language:implicitConversions",
+  "-language:postfixOps",
+  "-Ymacro-annotations",
+  "-Wdead-code",
+  "-Werror",
+  "-Wnumeric-widen",
+  "-Xlint:-unused"
 )
 
-resolvers +=
-  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+// Uncomment for tests written using zio-tests
+//Test / testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
+
+val zioVersion       = "1.0.9"
+val zioConfigVersion = "1.0.6"
 
 libraryDependencies ++= Seq(
-  "com.github.pureconfig"      %% "pureconfig"           % "0.13.0",
-  "com.softwaremill.quicklens" %% "quicklens"            % "1.6.1",
-  "com.typesafe.akka"          %% "akka-stream"          % "2.6.6",
-  "com.typesafe.akka"          %% "akka-http"            % "10.1.12",
-  "de.heikoseeberger"          %% "akka-http-circe"      % "1.33.0",
-  "io.circe"                   %% "circe-core"           % "0.13.0",
-  "io.circe"                   %% "circe-generic"        % "0.13.0",
-  "io.circe"                   %% "circe-generic-extras" % "0.13.0",
-  "io.circe"                   %% "circe-jawn"           % "0.13.0",
-  "org.atnos"                  %% "eff"                  % "5.10.0",
-  "org.atnos"                  %% "eff-monix"            % "5.10.0",
-  "org.zalando"                %% "grafter"              % "2.6.1",
-  "ch.qos.logback"             % "logback-classic"       % "1.2.3",
-  "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.2"
+  "dev.zio" %% "zio"                 % zioVersion,
+  "dev.zio" %% "zio-macros"          % zioVersion,
+  "dev.zio" %% "zio-streams"         % zioVersion,
+  "dev.zio" %% "zio-logging-slf4j"   % "0.5.11",
+  "dev.zio" %% "zio-config-magnolia" % zioConfigVersion,
+  "dev.zio" %% "zio-config-typesafe" % zioConfigVersion,
+  "dev.zio" %% "zio-json"            % "0.1.5",
+  "dev.zio" %% "zio-test-sbt"        % zioVersion
 )
 
-addCompilerPlugin("org.typelevel"   %% "kind-projector" % "0.11.0" cross CrossVersion.full)
-addCompilerPlugin("org.scalamacros" %% "paradise"       % "2.1.1" cross CrossVersion.full)
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-stream"        % "2.6.14",
+  "com.typesafe.akka" %% "akka-http"          % "10.2.4",
+  "de.heikoseeberger" %% "akka-http-zio-json" % "1.37.0",
+  "ch.qos.logback"     % "logback-classic"    % "1.2.3"
+)

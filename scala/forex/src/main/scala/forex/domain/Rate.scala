@@ -1,25 +1,26 @@
 package forex.domain
 
-import io.circe._
-import io.circe.generic.semiauto._
+import java.time.OffsetDateTime
 
-case class Rate(
-    pair: Rate.Pair,
-    price: Price,
-    timestamp: Timestamp
+import zio.json.{DeriveJsonEncoder, JsonEncoder}
+
+final case class Rate(
+  pair: Rate.Pair,
+  price: Price,
+  timestamp: OffsetDateTime
 )
 
 object Rate {
+
   final case class Pair(
-      from: Currency,
-      to: Currency
+    from: Currency,
+    to: Currency
   )
 
   object Pair {
-    implicit val encoder: Encoder[Pair] =
-      deriveEncoder[Pair]
+
+    implicit val encoder: JsonEncoder[Pair] = DeriveJsonEncoder.gen[Pair]
   }
 
-  implicit val encoder: Encoder[Rate] =
-    deriveEncoder[Rate]
+  implicit val encoder: JsonEncoder[Rate] = DeriveJsonEncoder.gen[Rate]
 }
