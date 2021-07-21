@@ -17,8 +17,8 @@ scalacOptions ++= Seq(
   "-Xlint:-unused"
 )
 
-// Needed for tests written with zio-tests
-Test / testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
+// Uncomment for tests written using zio-tests
+//Test / testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
 
 val zioVersion       = "1.0.9"
 val zioConfigVersion = "1.0.6"
