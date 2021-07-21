@@ -1,5 +1,7 @@
 package forex.interfaces.api.rates
 
+import java.time.OffsetDateTime
+
 import forex.domain._
 import zio.json.{DeriveJsonEncoder, JsonEncoder}
 
@@ -14,7 +16,7 @@ object Protocol {
     from: Currency,
     to: Currency,
     price: Price,
-    timestamp: Timestamp
+    timestamp: OffsetDateTime
   )
 
   object GetApiResponse {

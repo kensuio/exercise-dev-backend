@@ -1,11 +1,13 @@
 package forex.domain
 
+import java.time.OffsetDateTime
+
 import zio.json.{DeriveJsonEncoder, JsonEncoder}
 
 final case class Rate(
   pair: Rate.Pair,
   price: Price,
-  timestamp: Timestamp
+  timestamp: OffsetDateTime
 )
 
 object Rate {
