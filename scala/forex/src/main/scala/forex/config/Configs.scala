@@ -14,14 +14,10 @@ object ApplicationConfig {
 
 final case class AkkaConfig(
   name: String,
-  exitJvmTimeout: Option[Duration]
+  exitJvmTimeout: Duration
 )
 
 final case class ApiConfig(
   interface: String,
   port: Int
-)
-
-final case class ExecutorsConfig(
-  default: String
 )

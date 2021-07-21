@@ -11,6 +11,8 @@ import forex.main.HttpServer.HttpServer
 import forex.processes.rates.RatesService
 import forex.services.oneforge.OneForge
 import zio._
+import zio.clock.Clock
+import zio.config._
 import zio.config.syntax._
 import zio.config.typesafe.TypesafeConfig
 import zio.logging.{LogAnnotation, Logging}
@@ -26,12 +28,19 @@ object Main extends App {
   private val program: RIO[HttpServer with ZEnv, Unit] =
     HttpServer.start.useForever
 
-  private def prepareEnvironment(rawConfig: Config): TaskLayer[HttpServer] = {
+  private def prepareEnvironment(rawConfig: Config): RLayer[Clock, HttpServer] = {
     val configLayer = TypesafeConfig.fromTypesafeConfig(rawConfig, ApplicationConfig.descriptor)
 
-    val actorSystemLayer: TaskLayer[Has[ActorSystem]] = ZLayer.fromManaged {
-      ZManaged.make(ZIO(ActorSystem("forex-system")))(s => ZIO.fromFuture(_ => s.terminate()).either)
-    }
+    val clock = ZLayer.identity[Clock]
+
+    val actorSystemLayer: RLayer[Clock, Has[ActorSystem]] =
+      (clock ++ configLayer.narrow(_.akka)) >>> ZLayer.fromManaged {
+        ZManaged.fromEffect(getConfig[AkkaConfig]).flatMap(config =>
+          ZManaged.make(ZIO(ActorSystem(config.name)))(s =>
+            ZIO.fromFuture(_ => s.terminate()).timeout(config.exitJvmTimeout).orDie
+          )
+        )
+      }
 
     val loggingLayer: ULayer[Logging] = Slf4jLogger.make { (context, message) =>
       val logFormat     = "[correlation-id = %s] %s"
@@ -45,13 +54,13 @@ object Main extends App {
 
     val ratesApi = ratesService >>> RatesApi.live
 
-    val apiLayer: TaskLayer[Has[Api]] =
+    val apiLayer: RLayer[Clock, Has[Api]] =
       (configLayer ++ actorSystemLayer ++ loggingLayer ++ ratesApi) >>> Api.live
 
     val routesLayer: URLayer[Has[Api], Has[Route]] =
       ZLayer.fromService(_.routes)
 
-    val serverEnv: TaskLayer[HttpServer] =
+    val serverEnv: RLayer[Clock, HttpServer] =
       (actorSystemLayer ++ configLayer.narrow(_.api) ++ (apiLayer >>> routesLayer) ++ loggingLayer) >>> HttpServer.live
 
     serverEnv
