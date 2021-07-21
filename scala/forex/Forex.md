@@ -25,11 +25,11 @@ please check this [summary](https://zio.dev/docs/overview/overview_index), [effe
 The ZIO is a IO monad, to run/execute it manually if needed, use the [runtime](https://zio.dev/docs/overview/overview_running_effects).
 
 Some notes:
-- Don't feel limited by the existing dependencies; you can include others or drop something
+- Don't feel limited by the existing library dependencies; you can include others or drop something
 - The interfaces provided act as an example/starting point. Feel free to add to improve or built on it when needed.
 - The `Rates` service currently only use a single dependency. Don't feel limited, and do add others if you see fit.
 - It's great for downstream users of the service (your colleagues) if the api returns descriptive errors in case something goes wrong.
-- Feel free to fix any unsafe methods you might encounter.
+- Feel free to update existing code in case you find it useful or needed.
 
 Some traits/specifics we are looking for using this exercise:
 

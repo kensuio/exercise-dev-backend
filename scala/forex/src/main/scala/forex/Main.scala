@@ -8,7 +8,7 @@ import forex.interfaces.api.Api
 import forex.interfaces.api.rates.RatesApi
 import forex.main._
 import forex.main.HttpServer.HttpServer
-import forex.processes.rates.Rates
+import forex.rates.Rates
 import forex.services.oneforge.OneForge
 import zio._
 import zio.clock.Clock
@@ -22,11 +22,8 @@ object Main extends App {
 
   def run(args: List[String]): URIO[ZEnv, ExitCode] =
     ZIO(ConfigFactory.load.resolve)
-      .flatMap(rawConfig => program.provideCustomLayer(prepareEnvironment(rawConfig)))
+      .flatMap(rawConfig => HttpServer.start.useForever.provideCustomLayer(prepareEnvironment(rawConfig)))
       .exitCode
-
-  private val program: RIO[HttpServer with ZEnv, Unit] =
-    HttpServer.start.useForever
 
   private def prepareEnvironment(rawConfig: Config): RLayer[Clock, HttpServer] = {
     val configLayer = TypesafeConfig.fromTypesafeConfig(rawConfig, ApplicationConfig.descriptor)

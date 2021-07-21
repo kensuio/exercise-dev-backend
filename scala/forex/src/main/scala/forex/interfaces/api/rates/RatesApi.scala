@@ -4,7 +4,7 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.server.{Directives, Route}
 import forex.domain.Currency
 import forex.interfaces.api.utils.ApiMarshallers
-import forex.processes.rates.Rates
+import forex.rates.Rates
 import zio._
 
 trait RatesApi {

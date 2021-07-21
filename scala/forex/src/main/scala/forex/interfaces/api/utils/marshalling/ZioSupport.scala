@@ -2,10 +2,8 @@ package forex.interfaces.api.utils.marshalling
 
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.model._
-import forex.processes.rates.RatesError
+import forex.rates.RatesError
 import zio.{BootstrapRuntime, IO}
-
-import scala.concurrent._
 
 trait ZioSupport extends BootstrapRuntime {
 
@@ -30,11 +28,6 @@ trait ZioSupport extends BootstrapRuntime {
         e => IO.fromFuture(implicit ec => me(e)),
         a => IO.fromFuture(implicit ec => ma(a))
       )
-
-      val p = Promise[List[Marshalling[HttpResponse]]]()
-
-      unsafeRunAsync(r)(_.fold(e => p.failure(e.squash), s => p.success(s)))
-
-      p.future
+      unsafeRunToFuture(r)
     }
 }

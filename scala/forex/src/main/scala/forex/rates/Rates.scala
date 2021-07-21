@@ -1,4 +1,4 @@
-package forex.processes.rates
+package forex.rates
 
 import forex.domain._
 import forex.services.oneforge.{OneForge, OneForgeError}

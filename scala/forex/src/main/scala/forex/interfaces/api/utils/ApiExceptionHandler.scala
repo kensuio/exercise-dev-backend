@@ -1,7 +1,7 @@
 package forex.interfaces.api.utils
 
 import akka.http.scaladsl._
-import forex.processes.rates.RatesError
+import forex.rates.RatesError
 
 object ApiExceptionHandler {
 
