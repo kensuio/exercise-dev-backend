@@ -4,12 +4,12 @@ import forex.domain._
 import forex.services.oneforge.{OneForge, OneForgeError}
 import zio._
 
-trait RatesService {
+trait Rates {
 
   def get(request: GetRequest): IO[RatesError, Rate]
 }
 
-final case class OneForgeRatesService(oneForge: OneForge) extends RatesService {
+final case class OneForgeRates(oneForge: OneForge) extends Rates {
 
   override def get(request: GetRequest): IO[RatesError, Rate] =
     oneForge.get(Rate.Pair(request.from, request.to)).mapError(toProcessError)
@@ -22,8 +22,8 @@ final case class OneForgeRatesService(oneForge: OneForge) extends RatesService {
   }
 }
 
-object RatesService {
+object Rates {
 
-  val oneForge: URLayer[Has[OneForge], Has[RatesService]] =
-    (OneForgeRatesService(_)).toLayer
+  val oneForge: URLayer[Has[OneForge], Has[Rates]] =
+    (OneForgeRates(_)).toLayer
 }

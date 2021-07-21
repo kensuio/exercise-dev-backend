@@ -8,7 +8,7 @@ import forex.interfaces.api.Api
 import forex.interfaces.api.rates.RatesApi
 import forex.main._
 import forex.main.HttpServer.HttpServer
-import forex.processes.rates.RatesService
+import forex.processes.rates.Rates
 import forex.services.oneforge.OneForge
 import zio._
 import zio.clock.Clock
@@ -50,7 +50,7 @@ object Main extends App {
 
     val oneForge = OneForge.dummy
 
-    val ratesService = oneForge >>> RatesService.oneForge
+    val ratesService = oneForge >>> Rates.oneForge
 
     val ratesApi = ratesService >>> RatesApi.live
 

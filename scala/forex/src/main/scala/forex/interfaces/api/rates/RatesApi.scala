@@ -4,7 +4,7 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.server.{Directives, Route}
 import forex.domain.Currency
 import forex.interfaces.api.utils.ApiMarshallers
-import forex.processes.rates.RatesService
+import forex.processes.rates.Rates
 import zio._
 
 trait RatesApi {
@@ -12,7 +12,7 @@ trait RatesApi {
 }
 
 final case class DefaultRatesApi(
-  ratesService: RatesService
+  ratesService: Rates
 ) extends RatesApi
     with Directives
     with ApiMarshallers {
@@ -44,6 +44,6 @@ final case class DefaultRatesApi(
 
 object RatesApi {
 
-  val live: ZLayer[Has[RatesService], Nothing, Has[RatesApi]] =
+  val live: ZLayer[Has[Rates], Nothing, Has[RatesApi]] =
     (DefaultRatesApi(_)).toLayer
 }
