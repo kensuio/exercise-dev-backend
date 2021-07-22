@@ -6,6 +6,7 @@ final case class Price(value: BigDecimal) extends AnyVal
 
 object Price {
 
+  /** Custom constructor based on primitives */
   def apply(value: Int): Price =
     Price(BigDecimal(value))
 

@@ -3,6 +3,7 @@ package forex.services
 import scala.util.control.NoStackTrace
 
 package object oneforge {
+  /* Custom errors for the client calls seen/handled by the upstream service caller */
 
   sealed trait OneForgeError extends Throwable with NoStackTrace
 

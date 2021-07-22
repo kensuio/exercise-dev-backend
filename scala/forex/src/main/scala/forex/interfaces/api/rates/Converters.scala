@@ -3,6 +3,7 @@ package forex.interfaces.api.rates
 import forex.domain._
 import forex.rates.GetRequest
 
+/** Logic to map between domain-level and api-level protocols */
 object Converters {
   import Protocol._
 

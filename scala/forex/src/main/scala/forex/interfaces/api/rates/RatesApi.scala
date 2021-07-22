@@ -6,20 +6,23 @@ import forex.domain.Currency
 import forex.interfaces.api.utils.ApiMarshallers
 import forex.rates.Rates
 import zio._
+import forex.interfaces.api.Api
 
-trait RatesApi {
-  def routes: Route
-}
-
-final case class DefaultRatesApi(
+/* Does basic conversions and internal calls to the underlying service */
+private final class DefaultRatesApi(
   ratesService: Rates
-) extends RatesApi
+) extends Api
     with Directives
     with ApiMarshallers {
 
   import unmarshalling.Unmarshaller
   import Converters._
   import Protocol._
+
+  /* Akka/Future based implementation of the http endpoints.
+   * No automatic typed error propagation or recovery is done here
+   * like it  usually happens with [[zio.ZIO]] based services
+   */
 
   private val currency =
     Unmarshaller.strict[String, Currency](Currency.fromString)
@@ -44,6 +47,11 @@ final case class DefaultRatesApi(
 
 object RatesApi {
 
-  val live: ZLayer[Has[Rates], Nothing, Has[RatesApi]] =
-    (DefaultRatesApi(_)).toLayer
+  /**
+   * Provides a [[Rates]] service exposed as an [[Api]]
+   * That is, expose the service as http endpoints for akka.
+   */
+  val live: ZLayer[Has[Rates], Nothing, Has[Api]] =
+    (new DefaultRatesApi(_)).toLayer
+
 }

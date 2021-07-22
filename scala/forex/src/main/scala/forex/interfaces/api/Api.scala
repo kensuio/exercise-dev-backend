@@ -5,22 +5,33 @@ import forex.interfaces.api.rates.RatesApi
 import forex.interfaces.api.utils._
 import zio._
 
+/** Provides an api definition as akka-http routes */
 trait Api {
   def routes: Route
 }
 
-final case class RootApi(ratesApi: RatesApi) extends Api with Directives {
+/**
+ * The live layer will provide basic functionalities on top of any
+ * custom [[Api]], given as a required dependency.
+ */
+object Api {
+
+  val live: URLayer[Has[Api], Has[Api]] =
+    ZLayer.identity.update(RootApi.root)
+}
+
+/* provides basic error handling transparently */
+private final class RootApi(innerApi: Api) extends Api with Directives {
 
   override def routes: Route =
     handleExceptions(ApiExceptionHandler()) {
       handleRejections(ApiRejectionHandler()) {
-        ratesApi.routes
+        innerApi.routes
       }
     }
+
 }
 
-object Api {
-
-  val live: URLayer[Has[RatesApi], Has[Api]] =
-    (RootApi(_)).toLayer
+private object RootApi {
+  def root(innerApi: Api): Api = new RootApi(innerApi)
 }
