@@ -3,10 +3,10 @@ package forex.interfaces.api.rates
 import akka.http.scaladsl._
 import akka.http.scaladsl.server.{Directives, Route}
 import forex.domain.Currency
+import forex.interfaces.api.Api
 import forex.interfaces.api.utils.ApiMarshallers
 import forex.rates.Rates
 import zio._
-import forex.interfaces.api.Api
 
 /* Does basic conversions and internal calls to the underlying service */
 private final class DefaultRatesApi(

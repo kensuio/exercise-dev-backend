@@ -2,8 +2,7 @@ package forex
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
-import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import forex.config._
 import forex.interfaces.api.Api
 import forex.interfaces.api.rates.RatesApi
@@ -15,8 +14,7 @@ import zio.clock.Clock
 import zio.config._
 import zio.config.syntax._
 import zio.config.typesafe.TypesafeConfig
-import zio.logging.LogAnnotation
-import zio.logging.Logging
+import zio.logging.{LogAnnotation, Logging}
 import zio.logging.slf4j.Slf4jLogger
 
 import java.util.concurrent.TimeUnit
