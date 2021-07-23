@@ -22,7 +22,8 @@ In practice, this should require the following 2 points:
 The task is written using [ZIO](https://zio.dev/) library. Even if you are unfamiliar with it, the existing examples
 should be enough for you to understand the basic usage and follow the patterns. In case you want to read a bit more about that,
 please check this [summary](https://zio.dev/docs/overview/overview_index), [effect creation](https://zio.dev/docs/overview/overview_creating_effects) and about [layers](https://zio.dev/docs/datatypes/contextual/zlayer) that are a form of Dependency Injection.
-The ZIO is a IO monad, to run/execute it manually if needed, use the [runtime](https://zio.dev/docs/overview/overview_running_effects).
+
+The `ZIO` type is an IO-like effect type, to run/execute it manually if needed, use the [runtime](https://zio.dev/docs/overview/overview_running_effects).
 
 Some notes:
 - Don't feel limited by the existing library dependencies; you can include others or drop something

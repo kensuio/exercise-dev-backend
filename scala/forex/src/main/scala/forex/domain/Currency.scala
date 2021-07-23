@@ -4,6 +4,7 @@ import zio.json.JsonEncoder
 
 sealed trait Currency
 
+/** Provides explicit definitions alogn with json representation */
 object Currency {
   final case object AUD extends Currency
   final case object CAD extends Currency

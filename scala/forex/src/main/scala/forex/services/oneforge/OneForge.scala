@@ -5,6 +5,7 @@ import java.time.OffsetDateTime
 import forex.domain._
 import zio._
 
+/** One-forge service specific client api */
 trait OneForge {
   def get(pair: Rate.Pair): IO[OneForgeError, Rate]
 }
