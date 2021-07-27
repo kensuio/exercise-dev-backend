@@ -13,7 +13,7 @@ The application should at least support 10.000 requests per day.
 
 In practice, this should require the following 2 points:
 
-1. Create a `live` interpreter for the `OneForge` service. This should consume the [1forge API](https://1forge.com/forex-data-api/api-documentation), and do so using the [trial of the Starter package](https://1forge.com/forex-data-api/pricing).
+1. Create a `live` interpreter for the `OneForge` service. This should consume the [1forge API](https://1forge.com/forex-data-api/api-documentation), and do so using the [trial of the Starter package](https://1forge.com/forex-data-api/pricing). Please use the `p` property from their response.
 
 2. Adapt the `Rates` processes (if necessary) to make sure you cover the requirements of the use case, and work around possible limitations of the third-party provider.
 
