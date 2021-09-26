@@ -51,3 +51,21 @@ The first thing is: don't get stuck. We really don't want to trip you up intenti
  If you feel it is not possible to do this, just send us an email and we will try to clarify or correct the question for you.
 
 Cheers!
+
+## Kensu Project Details
+
+### BUSINESS CRITICALITY
+
+low
+
+### ENVIRONMENT
+
+internal
+
+### LIFECYCLE STAGE
+
+development
+
+### PROJECT OWNER
+
+michele-pinto-kensu
