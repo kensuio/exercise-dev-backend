@@ -13,7 +13,7 @@ The application should at least support 10.000 requests per day.
 
 In practice, this should require the following 2 points:
 
-1. Create a `live` interpreter for the `OneForge` service. This should consume the [1forge API](https://1forge.com/forex-data-api/api-documentation), and do so using the [trial of the Starter package](https://1forge.com/forex-data-api/pricing). Please use the `p` property from their response.
+1. Create a `live` interpreter for the `OneForge` service. This should consume the [1forge API](https://1forge.com/api), and do so using the [trial of the Starter package](https://1forge.com/pricing). Please use the `p` property from their response.
 
 2. Adapt the `Rates` processes (if necessary) to make sure you cover the requirements of the use case, and work around possible limitations of the third-party provider.
 
@@ -21,9 +21,9 @@ In practice, this should require the following 2 points:
 
 The task is written using [ZIO](https://zio.dev/) library. Even if you are unfamiliar with it, the existing examples
 should be enough for you to understand the basic usage and follow the patterns. In case you want to read a bit more about that,
-please check this [summary](https://zio.dev/docs/overview/overview_index), [effect creation](https://zio.dev/docs/overview/overview_creating_effects) and about [layers](https://zio.dev/docs/datatypes/contextual/zlayer) that are a form of Dependency Injection.
+please check this [summary](https://zio.dev/guides/), [effect creation](https://zio.dev/reference/core/zio/#creation) and about [layers](https://zio.dev/reference/di/dependency-injection-in-zio) that are a form of Dependency Injection.
 
-The `ZIO` type is an IO-like effect type, to run/execute it manually if needed, use the [runtime](https://zio.dev/docs/overview/overview_running_effects).
+The `ZIO` type is an IO-like effect type, to run/execute it manually if needed, use the [runtime](https://zio.dev/reference/core/runtime#running-a-zio-effect).
 
 Some notes:
 - Don't feel limited by the existing library dependencies; you can include others or drop something

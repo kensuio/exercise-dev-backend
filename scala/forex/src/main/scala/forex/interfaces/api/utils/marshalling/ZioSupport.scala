@@ -3,9 +3,9 @@ package forex.interfaces.api.utils.marshalling
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.model._
 import forex.rates.RatesError
-import zio.{BootstrapRuntime, IO}
+import zio.{IO, Unsafe, ZIO}
 
-trait ZioSupport extends BootstrapRuntime {
+trait ZioSupport {
 
   implicit val zioSupportErrorMarshaller: Marshaller[RatesError, HttpResponse] =
     Marshaller { implicit ec => error =>
@@ -24,10 +24,12 @@ trait ZioSupport extends BootstrapRuntime {
     me: Marshaller[E, HttpResponse]
   ): Marshaller[IO[E, A], HttpResponse] =
     Marshaller { implicit ec => a =>
-      val r = a.foldM(
-        e => IO.fromFuture(implicit ec => me(e)),
-        a => IO.fromFuture(implicit ec => ma(a))
+      val r = a.foldZIO(
+        e => ZIO.fromFuture(implicit ec => me(e)),
+        a => ZIO.fromFuture(implicit ec => ma(a))
       )
-      unsafeRunToFuture(r)
+      Unsafe.unsafe { implicit unsafe =>
+        zio.Runtime.default.unsafe.runToFuture(r)
+      }
     }
 }

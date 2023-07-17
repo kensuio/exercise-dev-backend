@@ -1,7 +1,6 @@
 package forex.interfaces.api
 
 import akka.http.scaladsl.server.{Directives, Route}
-import forex.interfaces.api.rates.RatesApi
 import forex.interfaces.api.utils._
 import zio._
 
@@ -16,8 +15,8 @@ trait Api {
  */
 object Api {
 
-  val live: URLayer[Has[Api], Has[Api]] =
-    ZLayer.identity.update(RootApi.root)
+  val live: URLayer[Api, Api] =
+    ZLayer.service[Api].update(RootApi.root)
 }
 
 /* provides basic error handling transparently */

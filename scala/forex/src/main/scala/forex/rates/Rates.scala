@@ -29,6 +29,6 @@ final case class OneForgeRates(oneForge: OneForge) extends Rates {
 object Rates {
 
   /** Builds a [[Rates]] based on the underlying one-forge implementation */
-  val oneForge: URLayer[Has[OneForge], Has[Rates]] =
-    (OneForgeRates(_)).toLayer
+  val oneForge: URLayer[OneForge, Rates] =
+    ZLayer.fromFunction(OneForgeRates.apply _)
 }
