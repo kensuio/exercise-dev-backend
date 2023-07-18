@@ -40,5 +40,5 @@ object Currency {
     case "USD" | "usd" => USD
   }
 
-  implicit val encoder: JsonEncoder[Currency] = JsonEncoder[String].xmap(fromString, toString)
+  implicit val encoder: JsonEncoder[Currency] = JsonEncoder[String].contramap[Currency](toString)
 }

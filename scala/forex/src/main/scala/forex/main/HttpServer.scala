@@ -5,7 +5,10 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import forex.config.ApiConfig
 import zio._
-import zio.logging.{Logger, Logging}
+
+trait HttpServer {
+  def start: ZIO[Scope, Throwable, Http.ServerBinding]
+}
 
 /**
  * An akka-based server definition
@@ -18,30 +21,29 @@ import zio.logging.{Logger, Logging}
  * - ActorSystem to run the http server
  * - ApiConfig to provide host/port definitions
  * - Route to describe the served endpoints
- * - Logging to notify the server operations
  * It will also free the socket resources
  */
 object HttpServer {
 
-  trait Service {
-    def start: Managed[Throwable, Http.ServerBinding]
-  }
-
-  val live: URLayer[Has[ActorSystem] with Has[ApiConfig] with Has[Route] with Logging, Has[Service]] =
-    ZLayer.fromServices[ActorSystem, ApiConfig, Route, Logger[String], HttpServer.Service] { (sys, cfg, routes, log) =>
-      new Service {
+  val live: URLayer[ActorSystem & ApiConfig & Route, HttpServer] =
+    ZLayer.fromZIO {
+      for {
+        sys    <- ZIO.service[ActorSystem]
+        cfg    <- ZIO.service[ApiConfig]
+        routes <- ZIO.service[Route]
+      } yield new HttpServer {
         implicit val system: ActorSystem = sys
 
-        val start: Managed[Throwable, Http.ServerBinding] =
-          ZManaged.make(
+        val start: ZIO[Scope, Throwable, Http.ServerBinding] =
+          ZIO.acquireRelease(
             ZIO
               .fromFuture(_ => Http().newServerAt(cfg.interface, cfg.port).bind(routes))
-              .zipLeft(log.info(s"Server online at http://${cfg.interface}:${cfg.port}"))
+              .zipLeft(ZIO.logInfo(s"Server online at http://${cfg.interface}:${cfg.port}"))
           )(b => ZIO.fromFuture(_ => b.unbind()).orDie)
       }
     }
 
   /** Shortcut to start the service, given as a required dependency */
-  def start: ZManaged[Has[Service], Throwable, Http.ServerBinding] =
-    ZManaged.accessManaged[Has[Service]](_.get.start)
+  def start: ZIO[Scope & HttpServer, Throwable, Http.ServerBinding] =
+    ZIO.serviceWithZIO[HttpServer](_.start)
 }

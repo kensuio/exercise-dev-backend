@@ -1,7 +1,7 @@
 package forex.config
 
-import zio.config.magnolia.DeriveConfigDescriptor
-import zio.duration.Duration
+import zio.config.magnolia.Descriptor
+import zio.Duration
 
 /* Here we collect the definitions that represent configurations needed to
  * run the application, as composite object trees
@@ -16,7 +16,7 @@ final case class ApplicationConfig(
 object ApplicationConfig {
 
   /** Provides configuration using [[zio.config]] */
-  val descriptor = DeriveConfigDescriptor.descriptor[ApplicationConfig]
+  val descriptor = Descriptor.descriptor[ApplicationConfig]
 }
 
 /** Needed to run the akka system */

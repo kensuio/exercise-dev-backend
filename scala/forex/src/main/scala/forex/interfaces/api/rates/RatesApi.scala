@@ -51,7 +51,10 @@ object RatesApi {
    * Provides a [[Rates]] service exposed as an [[Api]]
    * That is, expose the service as http endpoints for akka.
    */
-  val live: ZLayer[Has[Rates], Nothing, Has[Api]] =
-    (new DefaultRatesApi(_)).toLayer
-
+  val live: URLayer[Rates, Api] =
+    ZLayer.fromZIO {
+      for {
+        rates <- ZIO.service[Rates]
+      } yield new DefaultRatesApi(rates)
+    }
 }

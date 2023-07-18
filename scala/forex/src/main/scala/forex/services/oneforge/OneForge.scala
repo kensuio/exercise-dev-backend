@@ -13,12 +13,12 @@ trait OneForge {
 final case class DummyOneForge() extends OneForge {
 
   override def get(pair: Rate.Pair): IO[OneForgeError, Rate] =
-    UIO(Rate(pair, Price(2), OffsetDateTime.now()))
+    ZIO.succeed(Rate(pair, Price(2), OffsetDateTime.now()))
 }
 
 object OneForge {
 
   // Dummy is not enough...
-  val dummy: ULayer[Has[OneForge]] =
-    DummyOneForge.toLayer
+  val dummy: ULayer[OneForge] =
+    ZLayer.succeed(DummyOneForge())
 }
