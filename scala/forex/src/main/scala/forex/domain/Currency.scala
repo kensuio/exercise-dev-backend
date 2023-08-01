@@ -1,11 +1,12 @@
 package forex.domain
 
+import enumeratum._
 import zio.json.JsonEncoder
 
-sealed trait Currency
+sealed trait Currency extends EnumEntry
 
-/** Provides explicit definitions alogn with json representation */
-object Currency {
+/** Provides explicit definitions along with json representation */
+object Currency extends Enum[Currency] {
   final case object AUD extends Currency
   final case object CAD extends Currency
   final case object CHF extends Currency
@@ -41,4 +42,14 @@ object Currency {
   }
 
   implicit val encoder: JsonEncoder[Currency] = JsonEncoder[String].contramap[Currency](toString)
+
+  val values: IndexedSeq[Currency] = findValues
+
+  lazy val currencyPairs: Seq[(Currency, Currency)] = {
+    for {
+      from <- values
+      to <- values
+      if from != to
+    } yield (from, to)
+  }
 }

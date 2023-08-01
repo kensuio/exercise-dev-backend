@@ -18,6 +18,7 @@ final case class OneForgeRates(oneForge: OneForge) extends Rates {
       .get(Rate.Pair(request.from, request.to))
       .mapError(toDomainError)
 
+  // TODO: we should update this after we introduce cache layer between API service and the OneForge client
   private def toDomainError[T <: Throwable](t: T): RatesError = t match {
     case OneForgeError.Generic     => RatesError.Generic
     case OneForgeError.System(err) => RatesError.System(err)

@@ -10,7 +10,9 @@ import zio.Duration
 /** Overall config */
 final case class ApplicationConfig(
   akka: AkkaConfig,
-  api: ApiConfig
+  api: ApiConfig,
+  oneForge: OneForgeConfig,
+  oneForgeCache: OneForgeCacheConfig
 )
 
 object ApplicationConfig {
@@ -25,8 +27,19 @@ final case class AkkaConfig(
   exitJvmTimeout: Duration
 )
 
-/** Where to sun the server */
+/** Where to run the server */
 final case class ApiConfig(
   interface: String,
   port: Int
 )
+
+/** One forge API client config */
+final case class OneForgeConfig(
+  endpoint: String,
+  apiKey: String
+)
+
+final case class OneForgeCacheConfig(
+  ttl: Duration
+)
+
