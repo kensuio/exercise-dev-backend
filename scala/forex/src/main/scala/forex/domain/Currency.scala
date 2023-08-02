@@ -48,7 +48,7 @@ object Currency extends Enum[Currency] {
   lazy val currencyPairs: Seq[(Currency, Currency)] = {
     for {
       from <- values
-      to <- values
+      to   <- values
       if from != to
     } yield (from, to)
   }

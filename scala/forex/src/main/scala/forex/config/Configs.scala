@@ -42,4 +42,3 @@ final case class OneForgeConfig(
 final case class OneForgeCacheConfig(
   ttl: Duration
 )
-

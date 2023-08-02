@@ -40,7 +40,8 @@ object Main extends ZIOAppDefault {
           .timeout(cfg.exitJvmTimeout)
           .orDie
 
-      val akkaConfigLayer: ZLayer[Any, RuntimeException, AkkaConfig] = configLayer.narrow(_.akka) >>> ZLayer.fromZIO(getConfig[AkkaConfig])
+      val akkaConfigLayer: ZLayer[Any, RuntimeException, AkkaConfig] =
+        configLayer.narrow(_.akka) >>> ZLayer.fromZIO(getConfig[AkkaConfig])
 
       akkaConfigLayer >>>
         ZLayer.scoped {
