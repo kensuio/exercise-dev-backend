@@ -10,7 +10,7 @@ import zio._
 
 /* Does basic conversions and internal calls to the underlying service */
 private final class DefaultRatesApi(
-  ratesService: Rates
+  ratesService: Rates,
 ) extends Api
     with Directives
     with ApiMarshallers {

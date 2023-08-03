@@ -30,6 +30,8 @@ libraryDependencies ++= Seq(
   "dev.zio" %% "zio-logging-slf4j"   % "2.1.12",
   "dev.zio" %% "zio-config-magnolia" % zioConfigVersion,
   "dev.zio" %% "zio-config-typesafe" % zioConfigVersion,
+  "dev.zio" %% "zio-cache"           % "0.2.3",
+  "dev.zio" %% "zio-http"            % "3.0.0-RC2",
   "dev.zio" %% "zio-json"            % "0.5.0",
   "dev.zio" %% "zio-test-sbt"        % zioVersion
 )

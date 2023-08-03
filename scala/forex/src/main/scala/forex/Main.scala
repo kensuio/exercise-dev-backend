@@ -3,6 +3,7 @@ package forex
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
 import forex.config._
+import forex.domain._
 import forex.interfaces.api.Api
 import forex.interfaces.api.rates.RatesApi
 import forex.main.HttpServer
@@ -13,14 +14,21 @@ import zio.config.syntax._
 import zio.config.typesafe.TypesafeConfigSource
 import zio.logging.backend.SLF4J
 import zio.{ULayer, ZIOAppDefault, _}
+import zio.http.Client
+import forex.services.oneforge.OneForgeError
+import forex.services.oneforge.ZIOHttpOneForge
+import forex.utils.cache.InMemoryCache
+import forex.services.oneforge.OneForgeRatesCache
 
 object Main extends ZIOAppDefault {
 
   override def run =
-    ZIO.scoped((HttpServer.start) *> ZIO.never)
-      .provide(prepareEnvironment)
+    ZIO.scoped(
+      ((HttpServer.start) *> ZIO.never) &> OneForgeRatesCache.recacheAllEveryNMinutesIfConfigured
+    ).provide(prepareEnvironment)
+    
 
-  private def prepareEnvironment: RLayer[Any, HttpServer] = {
+  private def prepareEnvironment: ZLayer[Any, Throwable, HttpServer with InMemoryCache[Rate.Pair, OneForgeError, Rate] with OptimizationsConfig] = {
 
     /* Read configuration and builds the typed object */
     val configLayer =
@@ -52,19 +60,32 @@ object Main extends ZIOAppDefault {
     val loggingLayer: ULayer[Unit] =
       zio.Runtime.removeDefaultLoggers ++ SLF4J.slf4j
 
-    /* Build the routes to serve, based on defined services */
-    val routesLayer: ULayer[Route] = {
-      // Here we need something more that a dummy
-      val oneForge     = OneForge.dummy
-      val ratesService = oneForge >>> Rates.oneForge
-      val apiLayer     = ratesService >>> RatesApi.live >>> Api.live
-
-      /* extract routes from the complete API */
-      apiLayer >>> ZLayer(ZIO.serviceWith[Api](_.routes))
+    val oneForgeLayer: Layer[Throwable, OneForge] = {
+      val oneForgeConfigLayer = configLayer.narrow(_.oneForge) >>> ZLayer.fromZIO(getConfig[OneForgeConfig])
+      (Client.default ++ oneForgeConfigLayer) >>> OneForge.live
     }
 
-    /* combine the required layers to start the server */
-    (actorSystemLayer ++ configLayer.narrow(_.api) ++ routesLayer ++ loggingLayer) >>> HttpServer.live
+    val optimizationsConfigLayer = configLayer.narrow(_.optimizations) >>> ZLayer.fromZIO(getConfig[OptimizationsConfig])
 
+    val ratesCacheLayer: Layer[Throwable, InMemoryCache[Rate.Pair, OneForgeError, Rate]] = 
+      (oneForgeLayer ++ optimizationsConfigLayer) >>> ZLayer.fromZIO(
+        for {
+          optimizationConfig <- ZIO.service[OptimizationsConfig]
+          oneForge <- ZIO.service[OneForge]
+          cacheCapacity = optimizationConfig.cacheCapacity(Currency.allKnownPairs.size)
+          cache <- OneForgeRatesCache.make(cacheCapacity, Some(optimizationConfig.cacheTTLMinutes.minutes))
+        } yield cache
+      )
+
+    /* Build the routes to serve, based on defined services */
+    val routesLayer: Layer[Throwable, Route] = 
+      (oneForgeLayer ++ optimizationsConfigLayer ++ ratesCacheLayer) >>> ({
+        Rates.oneForge >>> RatesApi.live >>> Api.live >>>  ZLayer(ZIO.serviceWith[Api](_.routes))
+      })
+
+    val apiConfigLayer = configLayer.narrow(_.api)
+
+    /* combine the required layers to start the server and run the background-caching effect if configured */
+    ((actorSystemLayer ++ apiConfigLayer ++ routesLayer) >>> HttpServer.live) ++ optimizationsConfigLayer ++ ratesCacheLayer
   }
 }

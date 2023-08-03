@@ -14,7 +14,7 @@ trait ZioSupport {
           case RatesError.Generic            =>
             HttpResponse(StatusCodes.InternalServerError, entity = "Bad things happen, for example now")
           case RatesError.System(underlying) =>
-            HttpResponse(StatusCodes.InternalServerError, entity = s"Bad thing happened: ${underlying.getMessage}")
+            HttpResponse(StatusCodes.InternalServerError, entity = s"Bad thing happened: ${underlying.toString()}") //@TODO: Revert to underlying.getMessage
         }
       )
     }
