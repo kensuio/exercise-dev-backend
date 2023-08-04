@@ -24,8 +24,11 @@ class InMemoryCache[Key, Error <: Throwable, Value](
 
   private def cleanupStaleEntries(now: OffsetDateTime): ZIO[Any, Nothing, Unit] =
     ref.update { cache =>
-      cache.filter { case (_, (_, _, staleDateTime)) => staleDateTime.forall(now.isBefore) }
+      withoutStaleEntries(now, cache)
     }.unit
+  
+  private def withoutStaleEntries(now: OffsetDateTime, map: Map[Key, (Value, Option[OffsetDateTime], Option[OffsetDateTime])]): Map[Key, (Value, Option[OffsetDateTime], Option[OffsetDateTime])] =
+    map.filter { case (_, (_, _, staleDateTime)) => staleDateTime.forall(now.isBefore) }
 
   // Takes min of `capacity` and `n`, cleans up stale entries, then evicts the least recently accessed entries
   // (or random entries if none are accessed) until the min of `capacity` and `n` is free.
@@ -36,24 +39,26 @@ class InMemoryCache[Key, Error <: Throwable, Value](
     (for {
       now <- Clock.currentDateTime
       _   <- Console.printLine(s"Creating capacity for $n entries while trying to preserve ${tryToPreserve.size} entries").ignore
-      _   <- cleanupStaleEntries(now)
-      newMap   <-  ref.updateAndGet { cache => {
-                val numberCurrentlyFilled = cache.size
-                val numberCurrentlyFree  = capacity - numberCurrentlyFilled
-                val numberToFree = Math.min(capacity, n) - numberCurrentlyFree
-                val numberToPreserve = Math.min(numberCurrentlyFilled - numberToFree, tryToPreserve.size)
-                val keysToPreverse = tryToPreserve.take(numberToPreserve)
-                keysBeingPreserved = keysToPreverse
-                val filteredEntries = 
-                  cache
-                  .filter(entry => !keysToPreverse.contains(entry._1))
-                  .toSeq
-                  .sortBy { case (_, (_, lastAccessTime, _)) => lastAccessTime }
-                val entriesToEvict = filteredEntries.takeRight(numberToFree)
-                cache -- entriesToEvict.map(_._1)
-              }}
+      newMap   <-  ref.updateAndGet { cache => withFreedCapacity(n, tryToPreserve, now, cache) }
       _ <- Console.printLine(s"Preseved ${keysBeingPreserved.size} entries").ignore
     } yield (newMap)).uninterruptible
+  }
+
+  private def withFreedCapacity(n: Int, tryToPreserve: Seq[Key], now: OffsetDateTime, map: Map[Key, (Value, Option[OffsetDateTime], Option[OffsetDateTime])]): Map[Key, (Value, Option[OffsetDateTime], Option[OffsetDateTime])] = {
+    val mapWithoutStaleEntries = withoutStaleEntries(now, map)
+    val numberCurrentlyFilled = mapWithoutStaleEntries.size
+    val numberCurrentlyFree  = capacity - numberCurrentlyFilled
+    val numberToFree = Math.min(capacity, n) - numberCurrentlyFree
+    val numberToPreserve = Math.min(numberCurrentlyFilled - numberToFree, tryToPreserve.size)
+    val keysToPreverse = tryToPreserve.take(numberToPreserve)
+    val filteredEntries = 
+      map
+      .filter(entry => !keysToPreverse.contains(entry._1))
+      .toSeq
+      // This ensures we evict the least recently used entries
+      .sortBy { case (_, (_, lastAccessTime, _)) => lastAccessTime }
+    val entriesToEvict = filteredEntries.takeRight(numberToFree)
+    map -- entriesToEvict.map(_._1)
   }
 
   private def remove(keys: Seq[Key]): ZIO[Any, Nothing, Unit] =

@@ -46,26 +46,24 @@ final case class ZIOHttpOneForge(client: Client, config: OneForgeConfig) extends
   
     override def get(pair: Rate.Pair): IO[OneForgeError, Rate] =
       for {
-        url <- ZIO.fromEither(buildURL(config, Seq(pair))).mapError(e => OneForgeError.Generic(e.getMessage())) //@TODO: Improve errors
+        url <- ZIO.fromEither(buildURL(config, Seq(pair))).mapError(e => OneForgeError.GeneratedURLWasMalformed)
         request = buildRequest(url)
-        res <- client.request(request).mapError(e => OneForgeError.Generic(s"Request error: ${e.getMessage()}")) //@TODO: Improve errors
-        bodyString <- res.body.asString.mapError(e => OneForgeError.Generic(s"Cannot get response body: ${e.getMessage()}")) //@TODO: Improve errors
-        oneForgeQuote <- ZIO.fromEither(OneForgeResponse.pairQuoteDecoder.decodeJson(bodyString)).mapError(e => OneForgeError.Generic("Cannot decode body: " + e)) //@TODO: Improve errors
+        res <- client.request(request).mapError(e => OneForgeError.CommunicationError(e))
+        bodyString <- res.body.asString.mapError(e => OneForgeError.CommunicationError(e))
+        oneForgeQuote <- ZIO.fromEither(OneForgeResponse.pairQuoteDecoder.decodeJson(bodyString))
+                         .mapError(e => OneForgeError.ResponseParsingError(bodyString))
         oneForgePairQuote = oneForgeQuote
         rate = Rate(pair, Price(oneForgePairQuote.rate), oneForgePairQuote.timestamp)
       } yield rate
 
     override def getMultiple(pairs: Seq[Rate.Pair]): IO[OneForgeError, Seq[Rate]] =
       for {
-        url <- ZIO.fromEither(buildURL(config, pairs)).mapError(e => OneForgeError.Generic(e.getMessage())) //@TODO: Improve errors
+        url <- ZIO.fromEither(buildURL(config, pairs)).mapError(e => OneForgeError.GeneratedURLWasMalformed)
         request = buildRequest(url)
-        res <- client.request(request).mapError(
-          e => 
-            OneForgeError.Generic(s"Request error: ${e.getMessage()}")
-        ) //@TODO: Improve errors
-        bodyString <- res.body.asString.mapError(e => OneForgeError.Generic(s"Cannot get response body: ${e.getMessage()}")) //@TODO: Improve errors
-        oneForgeQuote <- ZIO.fromEither(bodyString.fromJson[Array[OneForgeResponse.PairQuote]]).mapError(e => OneForgeError.Generic("Cannot decode body: " + e)) //@TODO: Improve errors
-        rates <- ZIO.fromEither(OneForgeResponse.quoteToRates(oneForgeQuote.toSeq)).mapError(e => OneForgeError.Generic(e.getMessage())) //@TODO: Improve errors
+        res <- client.request(request).mapError(e => OneForgeError.CommunicationError(e))
+        bodyString <- res.body.asString.mapError(e => OneForgeError.CommunicationError(e))
+        oneForgeQuote <- ZIO.fromEither(bodyString.fromJson[Array[OneForgeResponse.PairQuote]]).mapError(e => OneForgeError.ResponseParsingError(bodyString))
+        rates <- ZIO.fromEither(OneForgeResponse.quoteToRates(oneForgeQuote.toSeq)).mapError(e => OneForgeError.ResponseParsingError(bodyString))
       } yield rates
       
 }

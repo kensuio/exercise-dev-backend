@@ -50,7 +50,7 @@ object OneForgeResponse {
     val ratesList = ratesEither match {
       case (Nil, _) => Left(new Exception("No rates found."))
       case (rates, Nil) => Right(rates.asInstanceOf[Seq[Right[Throwable, Rate]]].map(_.value))
-      case (_, _) => Left(new Exception("Some rates could not be parsed.")) //@TODO: Improve error handling
+      case (_, _) => Left(new Exception("Some rates could not be parsed."))
     }
     ratesList
   }

@@ -22,9 +22,6 @@ final case class OneForgeRates(oneForge: OneForge, config: OptimizationsConfig, 
   // One configurable optimization is querying and caching with a canonical order of currencies. 
   // If this optimization is configured and a request queries the inverted pair of a cached pair,
   // we will take the cached rate and return its inversion.
-  // WARNING: This option must only be enabled if a certain rounding error can be tolerated.
-  // However, since we present data to the user which may be stale by up to 5 minutes, 
-  // the rounding error during inversion of a conversion-rate is expected to be below the error from stale data.
   val pairTransformer = (pair: Rate.Pair) => if (config.canonicalize) pair.canonicalized else pair
   val resultTransformer = (originalPair: Rate.Pair) => (transformedPair: Rate.Pair) => (rate: Rate) => {
     val isFlipped = originalPair != transformedPair
@@ -41,13 +38,18 @@ final case class OneForgeRates(oneForge: OneForge, config: OptimizationsConfig, 
         val queryPair = pairTransformer(requestPair)
         for {
           result <- cache.get(queryPair).mapError(toDomainError)
-          _ <- if (result.isEmpty) ZIO.fail(RatesError.Generic) else ZIO.unit //@TODO: Improve error
+          _ <- if (result.isEmpty) ZIO.fail(RatesError.Generic(Some("Unknown currency pair."))) else ZIO.unit
           rate = resultTransformer(requestPair)(queryPair)(result.get)
         } yield rate
       }
 
   private def toDomainError[T <: Throwable](t: T): RatesError = t match {
-    case OneForgeError.Generic     => RatesError.Generic
+    case OneForgeError.Generic     => RatesError.Generic()
+    case OneForgeError.GeneratedURLWasMalformed => RatesError.ClientError(s"Error in generation of URL for backing service.")
+    case e @ OneForgeError.InvalidRequestError => RatesError.ClientError(e.toString())
+    case OneForgeError.CommunicationError(inner) => RatesError.CommunicationError(inner)
+    case OneForgeError.ServerError => RatesError.BackingServiceError
+    case OneForgeError.ResponseParsingError => RatesError.CouldNotDeriveRatesFromResponseError
     case OneForgeError.System(err) => RatesError.System(err)
     case e: RatesError             => e
     case e                         => RatesError.System(e)

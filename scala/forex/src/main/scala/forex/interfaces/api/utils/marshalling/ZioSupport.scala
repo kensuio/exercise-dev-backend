@@ -11,8 +11,16 @@ trait ZioSupport {
     Marshaller { implicit ec => error =>
       PredefinedToResponseMarshallers.fromResponse(
         error match {
-          case RatesError.Generic            =>
-            HttpResponse(StatusCodes.InternalServerError, entity = "Bad things happen, for example now")
+          case RatesError.Generic(description)            =>
+            HttpResponse(StatusCodes.InternalServerError, entity = s"Unspecific error fetching rates. Description if available: [$description]")
+          case e @ RatesError.ClientError(_) =>
+            HttpResponse(StatusCodes.InternalServerError, entity = s"Client-error fetching rates: $e")
+          case e @ RatesError.CommunicationError(_) =>
+            HttpResponse(StatusCodes.InternalServerError, entity = s"Communication-error fetching rates: $e")
+          case e @ RatesError.BackingServiceError =>
+            HttpResponse(StatusCodes.BadGateway, entity = s"Error fetching rates: $e")
+          case e @ RatesError.CouldNotDeriveRatesFromResponseError =>
+            HttpResponse(StatusCodes.InternalServerError, entity = s"Error fetching rates: $e")
           case RatesError.System(underlying) =>
             HttpResponse(StatusCodes.InternalServerError, entity = s"Bad thing happened: ${underlying.getMessage()}")
         }

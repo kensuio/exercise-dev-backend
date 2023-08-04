@@ -14,8 +14,8 @@ package object oneforge {
     final case class Generic(message: String = "") extends OneForgeError {
       override def toString(): String = s"OneForgeError: ${message}."
     }
-    final case class GeneratedURLWasMalformed(url: String) extends OneForgeError {
-      override def toString(): String = s"Generated URL for 1forge API was malformed: $url. Check configuration and url-building."
+    final case object GeneratedURLWasMalformed extends OneForgeError {
+      override def toString(): String = s"Could not generate URL for 1forge API because the result was malformed. Check configuration and url-building."
     }
     final case class CommunicationError(inner: Throwable) extends OneForgeError {
       override def toString(): String = s"Error in communication with 1forge API: ${inner.getMessage}."
