@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import scala.reflect.ClassTag
 
 /**
- *  A concurrency-safe in-memory cache with a fixed capacity and optional time-to-live.
+ *  A concurrency-safe in-memory cache with a fixed capacity, optional time-to-live and the affordance of out-of-bands cache updates.
  *  Eviction happens on a least-recently-used basis.
  * 
  *  Note: ZIO-cache would be a good solution if we didn't want to support an optimization which requires us
@@ -38,9 +38,7 @@ class InMemoryCache[Key, Error <: Throwable, Value](
     var keysBeingPreserved: Seq[Key]  = Seq.empty
     (for {
       now <- Clock.currentDateTime
-      _   <- Console.printLine(s"Creating capacity for $n entries while trying to preserve ${tryToPreserve.size} entries").ignore
       newMap   <-  ref.updateAndGet { cache => withFreedCapacity(n, tryToPreserve, now, cache) }
-      _ <- Console.printLine(s"Preseved ${keysBeingPreserved.size} entries").ignore
     } yield (newMap)).uninterruptible
   }
 
@@ -68,7 +66,7 @@ class InMemoryCache[Key, Error <: Throwable, Value](
 
   private def catchLookupThrowable[T <: Throwable](keys: Seq[Key], t: T): ZIO[Any, Error, Seq[Option[Value]]] = t match {
     // If the error is of the configured type, fail the operation
-    case e: Error => Console.printLine(s"Error: [${e.toString()}]").ignore *> ZIO.fail(e)
+    case e: Error => ZIO.fail(e)
     // Otherwise, just ignore the error and return None
     case _        => ZIO.succeed(Seq.fill(keys.size)(None))
   }
