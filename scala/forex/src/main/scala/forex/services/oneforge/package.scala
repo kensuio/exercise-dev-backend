@@ -12,7 +12,22 @@ package object oneforge {
   object OneForgeError {
     implicit val errorTag: Tag[OneForgeError] = Tag.tagFromTagMacro
     final case class Generic(message: String = "") extends OneForgeError {
-      override def toString(): String = s"OneForgeError: ${message}"
+      override def toString(): String = s"OneForgeError: ${message}."
+    }
+    final case class GeneratedURLWasMalformed(url: String) extends OneForgeError {
+      override def toString(): String = s"Generated URL for 1forge API was malformed: $url. Check configuration and url-building."
+    }
+    final case class CommunicationError(inner: Throwable) extends OneForgeError {
+      override def toString(): String = s"Error in communication with 1forge API: ${inner.getMessage}."
+    }
+    final case class InvalidRequestError(url: String, body: String) extends OneForgeError {
+      override def toString(): String = s"Invalid request to 1forge API with URL $url. Response was: $body."
+    }
+    final case class ServerError(body: String) extends OneForgeError {
+      override def toString(): String = s"Server error from 1forge API. Response was: $body."
+    }
+    final case class ResponseParsingError(responseBody: String) extends OneForgeError {
+      override def toString(): String = s"Error parsing response from 1forge API. Response was: $responseBody. Check model and decoder against documentation and response."
     }
     final case class System(underlying: Throwable) extends OneForgeError
   }

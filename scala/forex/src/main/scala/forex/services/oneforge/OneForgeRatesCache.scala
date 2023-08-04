@@ -26,8 +26,10 @@ object OneForgeRatesCache {
     def recacheAllEveryNMinutesIfConfigured: ZIO[InMemoryCache[Rate.Pair, OneForgeError, Rate] & OptimizationsConfig,Throwable,Unit] =
       for {
         optimizationsConfig <- ZIO.service[OptimizationsConfig]
-        _ <-  if (optimizationsConfig.fetchAll && optimizationsConfig.cacheTTLMinutes > 0) recacheAll else ZIO.unit
-        _ <-  if (optimizationsConfig.fetchAll && optimizationsConfig.cacheTTLMinutes > 0) recacheAll.schedule(
+        retryConfigOption = optimizationsConfig.retryFetchAllConfig
+        recacheEffect = retryConfigOption.map(retryConfig => retryConfig.effectWithRetry(recacheAll)).getOrElse(recacheAll)
+        _ <-  if (optimizationsConfig.fetchAll && optimizationsConfig.cacheTTLMinutes > 0) recacheEffect else ZIO.unit
+        _ <-  if (optimizationsConfig.fetchAll && optimizationsConfig.cacheTTLMinutes > 0) recacheEffect.schedule(
                 Schedule.spaced(optimizationsConfig.cacheTTLMinutes.minutes)
               ) else ZIO.unit
       } yield ()
@@ -35,18 +37,24 @@ object OneForgeRatesCache {
     def make(
       capacity: Int,
       timeToLive: Option[Duration],
-    ): ZIO[OneForge, Nothing, InMemoryCache[Rate.Pair, OneForgeError, Rate]] =
+    ): ZIO[OneForge & OptimizationsConfig, Nothing, InMemoryCache[Rate.Pair, OneForgeError, Rate]] =
       for {
         oneForge <- ZIO.service[OneForge]
+        optimizationsConfig <- ZIO.service[OptimizationsConfig]
+        retryConfigOption = optimizationsConfig.retryLookupConfig
+        withOptionalRetries = (effect: IO[OneForgeError, Seq[Option[Rate]]]) => 
+          retryConfigOption.map(retryConfig => retryConfig.effectWithRetry(effect)).getOrElse(effect)
         lookup =  
             (pairs: Seq[Rate.Pair]) => 
-              oneForge
+              withOptionalRetries(
+                oneForge
                 .getMultiple(pairs)
                 // Caching needs a lookup function that returns a Seq[Option[Rate]]
                 // (representing the opinionated choice that lookup-functions for a cache should support 
                 // distinguishing between a failure during lookup and an unknown key - at least on the type-level).
                 // Thus we map returned rates to `Some`.
                 .map(_.map(Some(_)))
+              )
         ref <- Ref.make(Map.empty[Rate.Pair, (Rate, Option[OffsetDateTime], Option[OffsetDateTime])])
       } yield new InMemoryCache[Rate.Pair, OneForgeError, Rate](lookup, capacity, timeToLive, ref)
 }

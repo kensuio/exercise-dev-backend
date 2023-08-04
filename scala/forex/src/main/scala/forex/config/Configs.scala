@@ -1,7 +1,7 @@
 package forex.config
 
 import zio.config.magnolia.Descriptor
-import zio.Duration
+import zio._
 
 /* Here we collect the definitions that represent configurations needed to
  * run the application, as composite object trees
@@ -33,6 +33,21 @@ final case class ApiConfig(
   port: Int
 )
 
+/** How to retry an effect */
+final case class RetryConfig(
+  maxRetries: Int,
+  baseDelayMilliseconds: Int,
+  exponentialBackoff: Boolean,
+) {
+  def effectWithRetry[I, E, O](effect: ZIO[I, E, O]): ZIO[I, E, O] = {
+    val retrySchedule = 
+      (if (exponentialBackoff) 
+        Schedule.exponential(baseDelayMilliseconds.milliseconds)
+      else Schedule.spaced(baseDelayMilliseconds.milliseconds)).jittered && Schedule.recurs(maxRetries)
+    effect.retry(retrySchedule)
+  }
+}
+
 /** Which optimizations to use */
 final case class OptimizationsConfig(
   // Canonicalize the ordering of currency-pairs in backing-service queries and cache.
@@ -45,6 +60,9 @@ final case class OptimizationsConfig(
   fetchAll: Boolean,
   // Cache the results of the queries for a given duration.
   cacheTTLMinutes: Int = 5,
+  // Retry lookup with exponential backoff
+  retryLookupConfig: Option[RetryConfig] = None,
+  retryFetchAllConfig: Option[RetryConfig] = None,
 ) {
   def cacheCapacity(noOfKnownCurrencies: Int): Int = noOfKnownCurrencies * (if (canonicalize) 1 else 2)
 }
@@ -54,3 +72,4 @@ final case class OneForgeConfig(
   apiKey: String,
   baseUrl: String = "api.1forge.com",
 )
+

@@ -3,6 +3,7 @@ package forex.domain
 import java.time.OffsetDateTime
 
 import zio.json.{DeriveJsonEncoder, JsonEncoder}
+import java.math.MathContext
 
 /**
  * The quotation for a given exchange rate
@@ -19,7 +20,7 @@ final case class Rate(
   /** For optimization purposes. We can return an inverted cached rate for an inverted order of queried currencies. */
   def invert: Rate = Rate(
     Rate.Pair(pair.to, pair.from), 
-    Price((BigDecimal("1.0", price.value.mc) / price.value).round(price.value.mc)), 
+    Price((BigDecimal("1.0", new MathContext(6)) / price.value)), 
     timestamp
   )
 }
